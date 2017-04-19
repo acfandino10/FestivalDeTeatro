@@ -12,7 +12,7 @@ public class Silla {
 	private int numero;
 
 	/**
-	 * Indica si la silla está reservada
+	 * Indica si la silla estï¿½ reservada
 	 */
 	private boolean estaReservada;
 
@@ -31,8 +31,11 @@ public class Silla {
 	/**
 	 * Localidad de la silla
 	 */
-	@JsonProperty(value="sitio")
+	@JsonProperty(value="id_sitio")
 	private int id_sitio;
+	
+	@JsonProperty(value="id_reserva")
+	private int id_reserva;
 	
 /**
  * Metodo constructor
@@ -40,17 +43,27 @@ public class Silla {
  * @param costo
  * @param localidad
  */
-	public Silla(@JsonProperty(value="numero")int numero, @JsonProperty(value="costo")double costo, @JsonProperty(value="localidad")String localidad, @JsonProperty(value="sitio")int id_sitio) {
+	public Silla(@JsonProperty(value="numero")int numero, @JsonProperty(value="costo")double costo,
+			@JsonProperty(value="localidad")String localidad, @JsonProperty(value="id_sitio")int id_sitio) {
 		super();
 		this.numero = numero;
 		estaReservada = false;
 		this.costo = costo;
 		this.localidad = localidad;
 		this.id_sitio = id_sitio;
+		this.id_reserva=0;
 	} 
 	
 	//Getters and Setters
 
+	
+	public int getIdReserva(){
+		return this.id_reserva;
+	}
+	public void setIdReserva(int id){
+		this.id_reserva=id;
+	}
+	
 public int getNumero() {
 	return numero;
 }

@@ -304,15 +304,15 @@ public class UsuariosServices {
 		
 				
 				@POST
-				@Path("id/{id}/evento/{id_evento}/realizado")
+				@Path("id/{id}/evento/{idFuncion}/realizado")
 				@Produces(MediaType.APPLICATION_JSON)
-				public Response registrarFuncionRealizada(@javax.ws.rs.PathParam("id") int id,@javax.ws.rs.PathParam("id_evento") int id_evento) throws Exception {
+				public Response registrarFuncionRealizada(@javax.ws.rs.PathParam("id") int id,@javax.ws.rs.PathParam("idFuncion") int idFuncion) throws Exception {
 					FestivAndesMaster tm = new FestivAndesMaster(getPath());
 					Funcion e=null;
 				     Usuario a = tm.buscarUsuariosPorId(id);
 						if(a.getRol().compareTo(Usuario.ROL_ADMINISTRADOR)==0){
 						try {
-							 e = tm.buscarEventoPorId(id_evento);
+							 e = tm.buscarFuncionPorId(idFuncion);
 						     e.setDisponibilidad(false);
 						     tm.updateEvento(e);
 						} catch (Exception o) {
@@ -330,13 +330,13 @@ public class UsuariosServices {
 			     * el error que se produjo
 				 */
 				@GET
-				@Path("/id/{id}/eventos")
+				@Path("/id/{id}/funciones")
 				@Produces({ MediaType.APPLICATION_JSON })
 				public Response getEventos() {
 					FestivAndesMaster tm = new FestivAndesMaster(getPath());
 					ArrayList<Funcion> lista;
 					try {
-						lista = tm.darEventos();
+						lista = tm.darFunciones();
 					} catch (Exception e) {
 						return Response.status(500).entity(doErrorMessage(e)).build();
 					}

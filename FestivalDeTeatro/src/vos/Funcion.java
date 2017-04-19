@@ -47,6 +47,13 @@ public class Funcion {
 	@JsonProperty(value="id_sitio")
 	private int id_sitio;
 	
+	@JsonProperty(value="id_sitio")
+	private String estado;
+	
+	public static String ESTADO_ENCURSO="ESTADO_ENCURSO";
+	public static String ESTADO_REALIZADA="ESTADO_REALIZADA";
+	public static String ESTADO_PREVISTA="ESTADO_PREVISTA";
+	
  /**
   * Metodo constructor de la clase evento
   * @param id
@@ -58,7 +65,7 @@ public class Funcion {
 	
 	public Funcion(@JsonProperty(value="id")int id, @JsonProperty(value="fecha") Date fecha, @JsonProperty(value="id_espectaculo") int nombre,
 			@JsonProperty(value="hora")Timestamp hora,
-			@JsonProperty(value="id_sitio")int sitio) {
+			@JsonProperty(value="id_sitio")int sitio, @JsonProperty(value="estado")String estado) {
 		super();
 		this.id = id;
 		this.fecha = fecha;
@@ -67,6 +74,7 @@ public class Funcion {
 		this.ganancias = 0;
 		this.hora = hora;
 		this.id_sitio = sitio;
+		this.estado=estado;
 		
 	}
 
@@ -104,6 +112,14 @@ public double getGanancias() {
 
 public void setGanancias(double ganancias) {
 	this.ganancias = ganancias;
+}
+
+public void setEstado(String estado){
+	this.estado = estado;
+}
+
+public String getEstado(){
+	return estado;
 }
 
 public int getId_espectaculo() {

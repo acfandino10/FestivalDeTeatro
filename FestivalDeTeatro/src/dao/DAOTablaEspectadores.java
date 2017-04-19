@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vos.Espectador;
+import vos.Reserva;
 
 
 
@@ -77,11 +78,11 @@ public class DAOTablaEspectadores {
 			String password = rs.getString("PASSWORD");
 			String tarjeta = rs.getString("TARJETA");
 			int estaRegistrado2 = Integer.parseInt(rs.getString("ESTAREGISTRADO"));
-			int id_bancoTarjeta = Integer.parseInt(rs.getString("ID_BANCOTARJETA"));
+			double saldo = Double.parseDouble(rs.getString("SALDO"));
 			boolean estaRegistrado;
 			if(estaRegistrado2==1) estaRegistrado=true;
 			else estaRegistrado=false;
-			espectadores.add(new Espectador(id, nombre, correo, password, tarjeta, estaRegistrado, id_bancoTarjeta));
+			espectadores.add(new Espectador(id, nombre, correo, password, tarjeta, estaRegistrado, saldo));
 		}
 		return espectadores;
 	}
@@ -112,9 +113,9 @@ public class DAOTablaEspectadores {
 			String password = rs.getString("PASSWORD");
 			String tarjeta = rs.getString("TARJETA");
 			Boolean estaRegistrado = rs.getBoolean("ESTAREGISTRADO");
-			int id_bancoTarjeta = Integer.parseInt(rs.getString("ID_BANCOTARJETA"));
+			double saldo = Double.parseDouble(rs.getString("SALDO"));
 			
-			espectadores.add(new Espectador(id, name2, correo, password, tarjeta, estaRegistrado, id_bancoTarjeta));
+			espectadores.add(new Espectador(id, name2, correo, password, tarjeta, estaRegistrado, saldo));
 		}
 
 		return espectadores;
@@ -142,7 +143,7 @@ public class DAOTablaEspectadores {
 		sql += espectador.getTarjeta() + "',";
 		sql += resp + ",";
 		sql += numero + ",";
-		sql += espectador.getBancoTarjeta() + ")";
+		sql += espectador.getSaldo() + ")";
 
 		System.out.println("SQL stmt:" + sql);
 
@@ -161,23 +162,28 @@ public class DAOTablaEspectadores {
 	 * @throws Exception - Cualquier error que no corresponda a la base de datos
 	 */
 	public void updateEspectador(Espectador espectador) throws SQLException, Exception {
-
+		
+		System.out.println("COMIENZA EL UPDATE");
+		
+		String sql = "UPDATE ISIS2304B071710.ESPECTADORES SET ";
+		
 		int res = 0;
 		if(espectador.isEstaRegistrado()) res=1;
-		String sql = "UPDATE ISIS2304B071710.ESPECTADORES SET ";
-		sql += "NOMBRE = '" + espectador.getNombre();
-		sql += "',CORREO = '" + espectador.getCorreo();
-		sql += "',PASSWORD = '" + espectador.getPassword();
-		sql += "',TARJETA = '" + espectador.getTarjeta();
-		sql += "',ESTAREGISTRADO = " + res;
-		sql += ",ID_BANCOTARJETA = " + espectador.getBancoTarjeta();
+		sql += "nombre = '"+espectador.getNombre()+"'";
+		sql += ",correo = '" + espectador.getCorreo()+"'";
+		sql += ",password = '" + espectador.getPassword()+"'";
+		sql += ",tarjeta = '" + espectador.getTarjeta()+"'";
+		sql += ",estaregistrado = " + res;
+		sql += ",saldo = " + espectador.getSaldo();
 		sql += " WHERE id = " + espectador.getId();
-
+		
 		System.out.println("SQL stmt:" + sql);
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
+		
+		System.out.println("COLAPSA EN EL UPDATE");
 	}
 
 	/**
@@ -220,11 +226,85 @@ public class DAOTablaEspectadores {
 			boolean result=false;
 			if(Integer.parseInt(rs.getString("ESTAREGISTRADO"))==1) result=true;
 			Boolean estaRegistrado = result;
-			int id_bancoTarjeta = Integer.parseInt(rs.getString("ID_BANCOTARJETA"));
+			double saldo = Double.parseDouble(rs.getString("SALDO"));
 			
-			espectador = new Espectador(id2, name, correo, password, tarjeta, estaRegistrado, id_bancoTarjeta);
+			espectador = new Espectador(id2, name, correo, password, tarjeta, estaRegistrado, saldo);
 		}
 
+		return espectador;
+	}
+
+	public ArrayList<Espectador> darEspectadoresDeFuncionYDevolverCosto(int id) throws SQLException {
+		
+		System.out.println("COMIENZA A DAR ESPECTADORES DE FUNCION Y DEVOLVER EL COSTO-----------");
+		ArrayList<Espectador> espectadores = new ArrayList<Espectador>();
+
+		String sql = "SELECT * FROM ISIS2304B071710.SILLAS sillas "
+				+ "INNER JOIN ISIS2304B071710.RESERVAS reservas ON sillas.ID_RESERVA=reservas.ID "
+				+ "INNER JOIN ISIS2304B071710.ESPECTADORES espectadores ON reservas.ID_ESPECTADOR=espectadores.ID "
+				+ "WHERE reservas.ID_FUNCION="+id;
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		System.out.println("Aun no ha colapsado");
+		
+
+		while (rs.next()) {
+			String nombre = rs.getString("NOMBRE");
+			int idNuevo = Integer.parseInt(rs.getString("ID_ESPECTADOR"));
+			String correo = rs.getString("CORREO");
+			String password = rs.getString("PASSWORD");
+			String tarjeta = rs.getString("TARJETA");
+			int estaRegistrado2 = Integer.parseInt(rs.getString("ESTAREGISTRADO"));
+			double saldo = Double.parseDouble(rs.getString("SALDO"));
+			boolean estaRegistrado;
+			if(estaRegistrado2==1) estaRegistrado=true;
+			else estaRegistrado=false;
+			double costoSilla= Double.parseDouble(rs.getString("COSTO"));
+			System.out.println("ESPECTADOR CON ID: "+idNuevo);
+			System.out.println("CUYO SALDO ACTUAL ES: "+saldo);
+			saldo+=costoSilla;
+			System.out.println("SE LE RETORNA LA BOLETA Y QUEDA CON UN SALDO ACTUAL DE : "+saldo);
+			espectadores.add(new Espectador(idNuevo, nombre, correo, password, tarjeta, estaRegistrado, saldo));
+		}
+		return espectadores;
+	}
+	
+	public Espectador darReservasDeEspectadorYDarAbono(int id, int idReserva) throws SQLException, Exception{
+		System.out.println("-------COMIENZA A DAR RESERVAS DE ESPECTADOR Y DAR ABONO------");
+		Espectador espectador = null;
+
+		String sql = "SELECT * FROM ISIS2304B071710.SILLAS sillas "
+				+ "INNER JOIN ISIS2304B071710.RESERVAS reservas ON sillas.ID_RESERVA=reservas.ID "
+				+ "INNER JOIN ISIS2304B071710.ESPECTADORES espectadores ON reservas.ID_ESPECTADOR=espectadores.ID "
+				+ "WHERE reservas.ID="+idReserva+" AND espectadores.ID="+id;
+
+		System.out.println(sql);
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+		
+
+		while (rs.next()) {
+			String nombre = rs.getString("NOMBRE");
+			int idNuevo = Integer.parseInt(rs.getString("ID_ESPECTADOR"));
+			String correo = rs.getString("CORREO");
+			String password = rs.getString("PASSWORD");
+			String tarjeta = rs.getString("TARJETA");
+			int estaRegistrado2 = Integer.parseInt(rs.getString("ESTAREGISTRADO"));
+			double saldo = Double.parseDouble(rs.getString("SALDO"));
+			boolean estaRegistrado;
+			if(estaRegistrado2==1) estaRegistrado=true;
+			else estaRegistrado=false;
+			double costoSilla= Double.parseDouble(rs.getString("COSTO"));
+			System.out.println("ESPECTADOR CON ID: "+idNuevo);
+			System.out.println("CUYO SALDO ACTUAL ES: "+saldo);
+			saldo=0.0;
+			System.out.println("SE LE RETORNA LA BOLETA Y QUEDA CON UN SALDO ACTUAL DE : "+saldo);
+			espectador = new Espectador(idNuevo, nombre, correo, password, tarjeta, estaRegistrado, saldo);
+		}
+		System.out.println("-------TERMINA DE DAR RESERVAS DE ESPECTADOR Y DAR ABONO--------");
 		return espectador;
 	}
 }

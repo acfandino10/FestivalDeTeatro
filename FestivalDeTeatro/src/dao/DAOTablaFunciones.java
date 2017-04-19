@@ -70,10 +70,10 @@ public class DAOTablaFunciones {
 	 * @throws SQLException - Cualquier error que la base de datos arroje.
 	 * @throws Exception - Cualquier error que no corresponda a la base de datos
 	 */
-	public ArrayList<Funcion> darEventos() throws SQLException, Exception {
+	public ArrayList<Funcion> darFunciones() throws SQLException, Exception {
 		ArrayList<Funcion> funcions = new ArrayList<Funcion>();
 
-		String sql = "SELECT * FROM ISIS2304B071710.EVENTOS";
+		String sql = "SELECT * FROM ISIS2304B071710.FUNCIONES";
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
@@ -88,7 +88,8 @@ public class DAOTablaFunciones {
 			int id_espectaculo = Integer.parseInt(rs.getString("ID_ESPECTACULO"));
 			Timestamp hora = rs.getTimestamp("HORA");
 			int id_sitio = Integer.parseInt(rs.getString("ID_SITIO"));
-			Funcion eventoNuevo = new Funcion(id, fecha, id_espectaculo, hora, id_sitio);
+			String estado = rs.getString("ESTADO");
+			Funcion eventoNuevo = new Funcion(id, fecha, id_espectaculo, hora, id_sitio,estado);
 			eventoNuevo.setDisponibilidad(disp);
 			eventoNuevo.setGanancias(Double.parseDouble(rs.getString("GANANCIAS")));
 			funcions.add(eventoNuevo);
@@ -107,7 +108,7 @@ public class DAOTablaFunciones {
 	public ArrayList<Funcion> buscarEventoPorEspectaculo(int espectaculo) throws SQLException, Exception {
 		ArrayList<Funcion> funcions = new ArrayList<Funcion>();
 
-		String sql = "SELECT * FROM ISIS2304B071710.EVENTOS WHERE ID_ESPECTACULO ='" + espectaculo + "'";
+		String sql = "SELECT * FROM ISIS2304B071710.FUNCIONES WHERE ID_ESPECTACULO ='" + espectaculo + "'";
 
 		System.out.println("SQL stmt:" + sql);
 
@@ -121,7 +122,8 @@ public class DAOTablaFunciones {
 			Date fecha = rs.getDate("FECHA");
 			Timestamp hora = rs.getTimestamp("HORA");
 			int id_sitio = Integer.parseInt(rs.getString("ID_SITIO"));
-			Funcion eventoNuevo = new Funcion(id, fecha, id_espectaculo, hora, id_sitio);
+			String estado = rs.getString("ESTADO");
+			Funcion eventoNuevo = new Funcion(id, fecha, id_espectaculo, hora, id_sitio,estado);
 			eventoNuevo.setDisponibilidad(Boolean.parseBoolean(rs.getString("DISPONIBILIDAD")));
 			eventoNuevo.setGanancias(Double.parseDouble(rs.getString("GANANCIAS")));
 			funcions.add(eventoNuevo);
@@ -142,14 +144,15 @@ public class DAOTablaFunciones {
 
 		int resp = 0;
 		if(funcion.isDisponibilidad()) resp=1;
-		String sql = "INSERT INTO ISIS2304B071710.EVENTOS VALUES (";
+		String sql = "INSERT INTO ISIS2304B071710.FUNCIONES VALUES (";
 		sql += funcion.getId() + ",";
 		sql += "(TO_DATE('"+funcion.getFecha()+"', 'YYYY-MM-DD'))" + ",";
 		sql += funcion.getId_espectaculo() + ",";
 		sql += funcion.getId_sitio() + ",";
 		sql += resp + ",";
 		sql += funcion.getGanancias() + ",'";
-		sql += funcion.getHora() + "')";
+		sql += funcion.getHora() + "','";
+		sql += funcion.getEstado() + "')";
 
 		System.out.println("SQL stmt:" + sql);
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
@@ -171,7 +174,7 @@ public class DAOTablaFunciones {
 
 		String hr = funcion.getHora().toString().substring(0, 18);
 		
-		String sql = "UPDATE ISIS2304B071710.EVENTOS SET ";
+		String sql = "UPDATE ISIS2304B071710.FUNCIONES SET ";
 		
 		int disp = 0;
 		if(funcion.isDisponibilidad()) disp=1;
@@ -199,10 +202,10 @@ public class DAOTablaFunciones {
 	 * @throws SQLException - Cualquier error que la base de datos arroje. No pudo actualizar el video.
 	 * @throws Exception - Cualquier error que no corresponda a la base de datos
 	 */
-	public void deleteEvento(Funcion funcion) throws SQLException, Exception {
+	public void deleteFuncion(int id) throws SQLException, Exception {
 
-		String sql = "DELETE FROM ISIS2304B071710.EVENTOS";
-		sql += " WHERE id = " + funcion.getId();
+		String sql = "DELETE FROM ISIS2304B071710.FUNCIONES";
+		sql += " WHERE id = " + id;
 
 		System.out.println("SQL stmt:" + sql);
 
@@ -211,11 +214,11 @@ public class DAOTablaFunciones {
 		prepStmt.executeQuery();
 	}
 
-	public Funcion buscarEventoPorId(int id) throws SQLException {
+	public Funcion buscarFuncionPorId(int id) throws SQLException {
 	
 		Funcion funcion = null;
 
-		String sql = "SELECT * FROM ISIS2304B071710.EVENTOS WHERE ID ='" + id + "'";
+		String sql = "SELECT * FROM ISIS2304B071710.FUNCIONES WHERE ID ='" + id + "'";
 
 		System.out.println("SQL stmt:" + sql);
 
@@ -231,8 +234,8 @@ public class DAOTablaFunciones {
 			int id_espectaculo = Integer.parseInt(rs.getString("ID_ESPECTACULO"));
 			int id_sitio = Integer.parseInt(rs.getString("ID_SITIO"));
 			Timestamp hora = rs.getTimestamp("HORA");
-			
-			funcion = new Funcion(id2, fecha, id_espectaculo, hora, id_sitio);
+			String estado = rs.getString("ESTADO");	
+			funcion = new Funcion(id2, fecha, id_espectaculo, hora, id_sitio,estado);
 			funcion.setDisponibilidad(disp);
 		}
 
@@ -280,7 +283,7 @@ public class DAOTablaFunciones {
 		
 		for(Espectaculo e : es)
 		{
-			for(Funcion funcion : lista.darEventos())
+			for(Funcion funcion : lista.darFunciones())
 			if(e.getId()== funcion.getId_espectaculo() ){
 			 funcions.add(funcion);	
 			}
@@ -293,7 +296,7 @@ public class DAOTablaFunciones {
 	
 	public double reporteFuncionTotal(int id) throws SQLException
 	{
-		Funcion funcion = buscarEventoPorId(id);
+		Funcion funcion = buscarFuncionPorId(id);
 		return funcion.getGanancias();
 	}
 	
@@ -304,7 +307,7 @@ public class DAOTablaFunciones {
 		DAOTablaSitios daoSitio = new DAOTablaSitios();
 		DAOTablaSillas daoSilla = new DAOTablaSillas();
 		
-		Funcion funcion = buscarEventoPorId(id_evento);
+		Funcion funcion = buscarFuncionPorId(id_evento);
 		Sitio sitio = daoSitio.buscarSitioPorId(funcion.getId_sitio());
 		
 		
@@ -325,19 +328,149 @@ public class DAOTablaFunciones {
 	public double reporteFuncionEspectador(int id_evento, int id_espectador) throws SQLException, Exception
 	{
 		double ganancias = 0.0;
-		DAOTablaReserva daoEspectador = new DAOTablaReserva();
+		DAOTablaReservas daoEspectador = new DAOTablaReservas();
 		DAOTablaSillas daoSilla = new DAOTablaSillas();
 		
 		ArrayList<Reserva> cliente = daoEspectador.buscarReservaPorEspectador(id_espectador);
 		
     	  for(Reserva s : cliente){
     		  
-    		  if(s.getId_evento()== id_evento){
-    		  Silla silla = daoSilla.buscarSillasPorNumero(s.getNumero_silla());
-    		  ganancias = ganancias + silla.getCosto();
-    		 }
+//    		  if(s.getId_evento()== id_evento){
+//    		  Silla silla = daoSilla.buscarSillasPorNumero(s.getNumero_silla());
+//    		  ganancias = ganancias + silla.getCosto();
+//    		 }
     		  
     	  }
 			return ganancias;	
+	}
+	
+	public ArrayList<Funcion> darFuncionesRealizadasEspectador(int id) throws NumberFormatException, SQLException {
+
+		System.out.println("LLEGA Y DA LAS FUNCIONES REALIZADAS DEL ESPECTADOR");
+		ArrayList<Funcion> funciones = new ArrayList<Funcion>();
+
+		String sql = "SELECT * FROM ISIS2304B071710.FUNCIONES fun "
+				+"INNER JOIN ISIS2304B071710.RESERVAS res ON fun.ID=res.ID_FUNCION "
+				+"INNER JOIN ISIS2304B071710.ESPECTADORES esp ON res.ID_ESPECTADOR=esp.ID "
+				+"WHERE fun.ESTADO='ESTADO_REALIZADA' AND esp.ESTAREGISTRADO=1 AND esp.ID='"+id+"'";
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			
+			boolean disp = false;
+			if(Integer.parseInt(rs.getString("DISPONIBILIDAD"))==1) disp=true;
+			int id2 = Integer.parseInt(rs.getString("ID"));
+			Date fecha = rs.getDate("FECHA");
+			int id_espectaculo = Integer.parseInt(rs.getString("ID_ESPECTACULO"));
+			Timestamp hora = rs.getTimestamp("HORA");
+			int id_sitio = Integer.parseInt(rs.getString("ID_SITIO"));
+			String estado = rs.getString("ESTADO");
+			Funcion eventoNuevo = new Funcion(id2, fecha, id_espectaculo, hora, id_sitio,estado);
+			eventoNuevo.setDisponibilidad(disp);
+			eventoNuevo.setGanancias(Double.parseDouble(rs.getString("GANANCIAS")));
+			funciones.add(eventoNuevo);
+		}
+		return funciones;
+	}
+
+	public ArrayList<Funcion> darFuncionesEnCursoEspectador(int id) throws NumberFormatException, SQLException {
+
+		System.out.println("LLEGA Y DA LAS FUNCIONES EN CURSO DEL ESPECTADOR");
+		
+		ArrayList<Funcion> funciones = new ArrayList<Funcion>();
+
+		String sql = "SELECT * FROM ISIS2304B071710.FUNCIONES fun "
+				+"INNER JOIN ISIS2304B071710.RESERVAS res ON fun.ID=res.ID_FUNCION "
+				+"INNER JOIN ISIS2304B071710.ESPECTADORES esp ON res.ID_ESPECTADOR=esp.ID "
+				+"WHERE fun.ESTADO='ESTADO_ENCURSO' AND esp.ESTAREGISTRADO=1 AND esp.ID='"+id+"'";
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			
+			boolean disp = false;
+			if(Integer.parseInt(rs.getString("DISPONIBILIDAD"))==1) disp=true;
+			int id2 = Integer.parseInt(rs.getString("ID"));
+			Date fecha = rs.getDate("FECHA");
+			int id_espectaculo = Integer.parseInt(rs.getString("ID_ESPECTACULO"));
+			Timestamp hora = rs.getTimestamp("HORA");
+			int id_sitio = Integer.parseInt(rs.getString("ID_SITIO"));
+			String estado = rs.getString("ESTADO");
+			Funcion eventoNuevo = new Funcion(id2, fecha, id_espectaculo, hora, id_sitio,estado);
+			eventoNuevo.setDisponibilidad(disp);
+			eventoNuevo.setGanancias(Double.parseDouble(rs.getString("GANANCIAS")));
+			funciones.add(eventoNuevo);
+		}
+		return funciones;
+	}
+	
+	public ArrayList<Funcion> darFuncionesPrevistasEspectador(int id) throws NumberFormatException, SQLException {
+
+		System.out.println("LLEGA Y DA LAS FUNCIONES PREVISTAS DEL ESPECTADOR");
+		ArrayList<Funcion> funciones = new ArrayList<Funcion>();
+
+		String sql = "SELECT * FROM ISIS2304B071710.FUNCIONES fun "
+				+"INNER JOIN ISIS2304B071710.RESERVAS res ON fun.ID=res.ID_FUNCION "
+				+"INNER JOIN ISIS2304B071710.ESPECTADORES esp ON res.ID_ESPECTADOR=esp.ID "
+				+"WHERE fun.ESTADO='ESTADO_PREVISTAS' AND esp.ESTAREGISTRADO=1 AND esp.ID='"+id+"'";
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			
+			boolean disp = false;
+			if(Integer.parseInt(rs.getString("DISPONIBILIDAD"))==1) disp=true;
+			int id2 = Integer.parseInt(rs.getString("ID"));
+			Date fecha = rs.getDate("FECHA");
+			int id_espectaculo = Integer.parseInt(rs.getString("ID_ESPECTACULO"));
+			Timestamp hora = rs.getTimestamp("HORA");
+			int id_sitio = Integer.parseInt(rs.getString("ID_SITIO"));
+			String estado = rs.getString("ESTADO");
+			Funcion eventoNuevo = new Funcion(id2, fecha, id_espectaculo, hora, id_sitio,estado);
+			eventoNuevo.setDisponibilidad(disp);
+			eventoNuevo.setGanancias(Double.parseDouble(rs.getString("GANANCIAS")));
+			funciones.add(eventoNuevo);
+		}
+		return funciones;
+	}
+	
+	public ArrayList<Funcion> darFuncionesCanceladas(int id) throws SQLException{
+
+		System.out.println("LLEGA Y DA LAS FUNCIONES CANCELADAS");
+		ArrayList<Funcion> funciones = new ArrayList<Funcion>();
+
+		String sql = "SELECT * FROM ISIS2304B071710.FUNCIONES fun "
+				+"INNER JOIN ISIS2304B071710.RESERVAS res ON fun.ID=res.ID_FUNCION "
+				+"INNER JOIN ISIS2304B071710.SILLAS silla ON res.NUMEROSILLA=silla.NUMERO "
+				+"INNER JOIN ISIS2304B071710.ESPECTADORES esp ON res.ID_ESPECTADOR=esp.ID "
+				+"WHERE esp.ESTAREGISTRADO=1 AND res.ESTADOACTIVE='ESTADO_CANCELADA' AND esp.ID='"+id+"'";
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			
+			boolean disp = false;
+			if(Integer.parseInt(rs.getString("DISPONIBILIDAD"))==1) disp=true;
+			int id2 = Integer.parseInt(rs.getString("ID"));
+			Date fecha = rs.getDate("FECHA");
+			int id_espectaculo = Integer.parseInt(rs.getString("ID_ESPECTACULO"));
+			Timestamp hora = rs.getTimestamp("HORA");
+			int id_sitio = Integer.parseInt(rs.getString("ID_SITIO"));
+			String estado = rs.getString("ESTADO");
+			Funcion eventoNuevo = new Funcion(id2, fecha, id_espectaculo, hora, id_sitio,estado);
+			eventoNuevo.setDisponibilidad(disp);
+			eventoNuevo.setGanancias(Double.parseDouble(rs.getString("GANANCIAS")));
+			funciones.add(eventoNuevo);
+		}
+		return funciones;
 	}
 }

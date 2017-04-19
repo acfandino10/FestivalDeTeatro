@@ -3,6 +3,10 @@ package vos;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Reserva {
+	
+	@JsonProperty(value="id")
+	private int id;
+	
 	/**
 	 * Id del espectador
 	 */
@@ -12,36 +16,50 @@ public class Reserva {
 	/**
 	 * Id del Funcion
 	 */
-	@JsonProperty(value="id_evento")
-	private int id_evento;
+	@JsonProperty(value="id_funcion")
+	private int id_funcion;
 	
-	/**
-	 * 
-	 */
-	@JsonProperty(value="numero_silla")
-	private int numero_silla;
+	
+	@JsonProperty(value="estadoactive")
+	private String estadoactive;
+	
+	public static String ESTADO_ACTIVA="ESTADO_ACTIVA";
+	public static String ESTADO_CANCELADA="ESTADO_CANCELADA";
 
-
-    private double abono;
 
 	/**
 	 * Metodo constructor de la relacion EventoCategoria
 	 * <b>post: </b> Crea la relacion con los valores que entran como parametro
+	 * @param estado 
 	 * @param id - Id del evento.
 	 * @param id - Id del espectador
 	 * @param dirPrincipal - Direccion de la oficina principal.
 	 */
-	public Reserva( @JsonProperty(value="id_espectador")int id_espectador, @JsonProperty(value="id_evento")int id_evento,
-	@JsonProperty(value="numero_silla")	int silla	) {
+	public Reserva( @JsonProperty(value="id_espectador")int id_espectador, @JsonProperty(value="id_funcion")int id_funcion,
+	@JsonProperty(value="estadoactive") String estadoactive,@JsonProperty(value="id")int id	) {
 		super();
+		this.id=id;
 		this.id_espectador = id_espectador;
-		this.id_evento = id_evento;
-		this.numero_silla = silla;
-		this.abono = 0.0;
+		this.id_funcion = id_funcion;
+		this.estadoactive=estadoactive;
 	}
 
 	//Getters and Setters
 
+	public int getId(){
+		return this.id;
+	}
+	
+	public void setId(int id){
+		this.id=id;
+	}
+	public String getEstado(){
+		return estadoactive;
+	}
+	
+	public void setEstado(String estado){
+		this.estadoactive=estado;
+	}
 	public int getId_espectador() {
 		return id_espectador;
 	}
@@ -54,30 +72,14 @@ public class Reserva {
 
 
 
-	public int getId_evento() {
-		return id_evento;
+	public int getIdFuncion() {
+		return id_funcion;
 	}
 
 
 
-	public void setId_evento(int id_evento) {
-		this.id_evento = id_evento;
-	}
-
-	public int getNumero_silla() {
-		return numero_silla;
-	}
-
-	public void setNumero_silla(int numero_silla) {
-		this.numero_silla = numero_silla;
-	}
-	
-	public double getAbono() {
-		return abono;
-	}
-	
-	public void setAbono(double abono) {
-		this.abono = abono;
+	public void setIdFuncion(int idFuncion) {
+		this.id_funcion = idFuncion;
 	}
 	
 }

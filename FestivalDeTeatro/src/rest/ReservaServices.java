@@ -8,13 +8,16 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import tm.FestivAndesMaster;
 import vos.Usuario;
 import vos.Espectaculo;
+import vos.Espectador;
 import vos.Funcion;
+import vos.NotaDebito;
 import vos.Reserva;
 import vos.Silla;
 
@@ -67,33 +70,33 @@ public class ReservaServices {
 	@Path("usuario/{idUsuario}/evento/{idEvento}/comprarSilla/{numeroSilla}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response registrarCompraBoleta(@javax.ws.rs.PathParam("idUsuario") int idUsuario, @javax.ws.rs.PathParam("idEvento") int idEvento,@javax.ws.rs.PathParam("numeroSilla") int numeroSilla) throws Exception {
+	public Response registrarCompraBoleta(@javax.ws.rs.PathParam("idUsuario") int idUsuario, @javax.ws.rs.PathParam("idFuncion") int idFuncion,@javax.ws.rs.PathParam("estado") String estado) throws Exception {
 		FestivAndesMaster tm = new FestivAndesMaster(getPath());
 		Usuario a = tm.buscarUsuariosPorId(idUsuario);
 		if(a.getRol()==Usuario.ROL_ESPECTADOR){
-			Reserva reserva = new Reserva(idUsuario, idEvento, numeroSilla);
-			Funcion funcion = tm.buscarEventoPorId(idEvento);
+//			Reserva reserva = new Reserva(idUsuario, idFuncion, estado);
+			Funcion funcion = tm.buscarFuncionPorId(idFuncion);
 			try {
-				if(tm.buscarSillasPorNumero(numeroSilla).isEstaReservada() == false)
-				{
-					tm.addReserva(reserva);
-				    Silla s = tm.buscarSillasPorNumero(numeroSilla);
-				    s.setEstaReservada(true);
-				    funcion.setGanancias(funcion.getGanancias()+s.getCosto());
-				    
-				    
-				    Espectaculo es = tm.buscarEspectaculoPorId(funcion.getId_espectaculo());
-				    es.setRentabilidad(es.getRentabilidad() + s.getCosto());
-				}
-				else
-				{
-					throw new Exception("La silla ya esta reservada");
-				}
+//				if(tm..isEstaReservada() == false)
+//				{
+//					tm.addReserva(reserva);
+//				    Silla s = tm.buscarSillasPorNumero(numeroSilla);
+//				    s.setEstaReservada(true);
+//				    funcion.setGanancias(funcion.getGanancias()+s.getCosto());
+//				    
+//				    
+//				    Espectaculo es = tm.buscarEspectaculoPorId(funcion.getId_espectaculo());
+//				    es.setRentabilidad(es.getRentabilidad() + s.getCosto());
+//				}
+//				else
+//				{
+//					throw new Exception("La silla ya esta reservada");
+//				}
 
 			} catch (Exception e) {
 				return Response.status(500).entity(doErrorMessage(e)).build();
 			}
-			return Response.status(200).entity(reserva).build();
+			return Response.status(200).entity(null).build();
 		} else return null;
 		
 	}
@@ -124,20 +127,20 @@ public class ReservaServices {
 		FestivAndesMaster tm = new FestivAndesMaster(getPath());
 		Usuario a = tm.buscarUsuariosPorId(idUsuario);
 		if(a.getRol()==Usuario.ROL_ESPECTADOR){
-			Reserva reserva = new Reserva(idUsuario, idEvento, numeroSilla);
+//			Reserva reserva = new Reserva(idUsuario, idEvento, numeroSilla);
 			try {
 				
-				registrarCompraBoleta(idUsuario, idEvento, numeroSilla);
-				
-				for(int i=1; i<cantidadSillas; i++){
-					registrarCompraBoleta(cantidadSillas, idEvento, numeroSilla + i);
-				}
+//				registrarCompraBoleta(idUsuario, idEvento, numeroSilla);
+//				
+//				for(int i=1; i<cantidadSillas; i++){
+//					registrarCompraBoleta(cantidadSillas, idEvento, numeroSilla + i);
+//				}
 				
 
 			} catch (Exception e) {
 				return Response.status(500).entity(doErrorMessage(e)).build();
 			}
-			return Response.status(200).entity(reserva).build();
+			return Response.status(200).entity(null).build();
 		} else return null;
 		
 	}
@@ -156,80 +159,29 @@ public class ReservaServices {
 	 * @return
 	 * @throws Exception
 	 */
-	@PUT
-	@Path("usuario/{idUsuario}/evento/{idEvento}/abonarSilla/{numeroSilla}")
+	@GET
+	@Path("comprarAbonamiento")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response registrarAbonoBoleta(@javax.ws.rs.PathParam("idUsuario") int idUsuario, @javax.ws.rs.PathParam("idEvento") int idEvento,@javax.ws.rs.PathParam("numeroSilla") int numeroSilla) throws Exception {
-		FestivAndesMaster tm = new FestivAndesMaster(getPath());
-		Usuario a = tm.buscarUsuariosPorId(idUsuario);
-		if(a.getRol()==Usuario.ROL_ESPECTADOR){
-			Reserva reserva = new Reserva(idUsuario, idEvento, numeroSilla);
-			Funcion funcion = tm.buscarEventoPorId(idEvento);
-			
-			
-			long time = System.currentTimeMillis();
-			java.sql.Date today = new java.sql.Date(time);
-			//La ultima condicion compara con hoy y cuenta 3 semanas --- (... || funcion.getFecha().getTime() - today.getTime() >= 3 semanas*7 dias a la semana*86,400,000 millisegundos al dia)
-			try {
-				if(tm.buscarSillasPorNumero(numeroSilla).isEstaReservada() == false && funcion.getFecha().before(today) == true && funcion.getFecha().getTime() - today.getTime() >= (3*7*86400000))
-				{
-					registrarCompraBoleta(idUsuario, idEvento, numeroSilla);
-					tm.addAbono(numeroSilla);
-				    Silla s = tm.buscarSillasPorNumero(numeroSilla);
-				   
-				    //Como registrarCompraBoleta sube las ganancias, aqui se le bajan
-				    funcion.setGanancias(funcion.getGanancias()-s.getCosto()+(s.getCosto()*0.2));
-				    
-				    Espectaculo es = tm.buscarEspectaculoPorId(funcion.getId_espectaculo());
-				    es.setRentabilidad(es.getRentabilidad() - s.getCosto()+(s.getCosto()*0.2));
-				}
-				else
-				{
-					throw new Exception("La silla ya est� reservada o se acabo el plazo para abonar en esta reserva");
-				}
-
-			} catch (Exception e) {
-				return Response.status(500).entity(doErrorMessage(e)).build();
-			}
-			return Response.status(200).entity(reserva).build();
-		} else return null;
-		
-	}
-
-	
-	@PUT
-	@Path("id/{id}/evento/{idEvento}/abonarSilla/{numeroSilla}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response registrarCompraConAbonoBoleta(@javax.ws.rs.PathParam("id") int id, @javax.ws.rs.PathParam("idEvento") int idEvento,@javax.ws.rs.PathParam("numeroSilla") int numeroSilla) throws Exception {
+	public Response registrarAbonoBoleta(@QueryParam("id") int id, @QueryParam("localidad") String localidad) throws Exception {
 		FestivAndesMaster tm = new FestivAndesMaster(getPath());
 		Usuario a = tm.buscarUsuariosPorId(id);
-		if(a.getRol()==Usuario.ROL_ESPECTADOR){
-			Reserva reserva = new Reserva(id, idEvento, numeroSilla);
-			Funcion funcion = tm.buscarEventoPorId(idEvento);
+		Espectador esp = tm.buscarEspectadorPorId(id);
+		NotaDebito note;
+		if((a.getRol().compareTo(Usuario.ROL_ESPECTADOR)==0)&&(esp.isEstaRegistrado())){
+
 			try {
-				if(tm.buscarSillasPorNumero(numeroSilla).isEstaReservada() == false && reserva.getAbono()>0)
-				{
 				
-				    Silla s = tm.buscarSillasPorNumero(numeroSilla);
-				    funcion.setGanancias(funcion.getGanancias()+(s.getCosto()-(s.getCosto()*0.4)));
-				    
-				    Espectaculo es = tm.buscarEspectaculoPorId(funcion.getId_espectaculo());
-				    es.setRentabilidad(es.getRentabilidad() + s.getCosto()-(s.getCosto()*0.4));
-				}
-				else
-				{
-					throw new Exception("La silla ya est� reservada");
-				}
+				//note=tm.devolverBoleta(idBoleta, id);
 
 			} catch (Exception e) {
 				return Response.status(500).entity(doErrorMessage(e)).build();
 			}
-			return Response.status(200).entity(reserva).build();
-		} else return null;
-		
+		} else return Response.status(500).entity(doErrorMessage(new Exception("El usuario tiene que ser rol espectador y estar registrado"))).build();
+
+		return Response.status(200).entity(null).build();
 	}
+
 
 	
 	//TODO RF12
@@ -244,44 +196,26 @@ public class ReservaServices {
 	 * @return
 	 * @throws Exception
 	 */
-	@PUT
-	@Path("usuario/{idUsuario}/evento/{idEvento}/devolverBoleta/{numeroSilla}")
-	@Consumes(MediaType.APPLICATION_JSON)
+	@GET
+	@Path("devolverBoleta")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response devolverBoleta(@javax.ws.rs.PathParam("idUsuario") int idUsuario, @javax.ws.rs.PathParam("idEvento") int idEvento,@javax.ws.rs.PathParam("numeroSilla") int numeroSilla) throws Exception {
+	public Response devolverBoleta(@QueryParam("id") int id, @QueryParam("idBoleta") int idBoleta) throws Exception {
 		FestivAndesMaster tm = new FestivAndesMaster(getPath());
-		Usuario a = tm.buscarUsuariosPorId(idUsuario);
-		if(a.getRol()==Usuario.ROL_ESPECTADOR){
-			Reserva reserva = new Reserva(idUsuario, idEvento, numeroSilla);
-			Funcion funcion = tm.buscarEventoPorId(idEvento);
+		Usuario a = tm.buscarUsuariosPorId(id);
+		Espectador esp = tm.buscarEspectadorPorId(id);
+		NotaDebito note;
+		if((a.getRol().compareTo(Usuario.ROL_ESPECTADOR)==0)&&(esp.isEstaRegistrado())){
+
 			try {
 				
-				long time = System.currentTimeMillis();
-				java.sql.Date today = new java.sql.Date(time);
-				
-				//la ultima condicion dice que hay 5 dias de diferencia entre hoy y el evento || funcion.getFecha().getTime() - today.getTime() >= 5 dias * 86,400,000 millisegundos al dia)				
-				if(tm.buscarSillasPorNumero(numeroSilla).isEstaReservada() == true && funcion.getFecha().before(today) == true && funcion.getFecha().getTime() - today.getTime() >= (5*86400000))
-				{
-					tm.deleteReserva(reserva);;
-				    Silla s = tm.buscarSillasPorNumero(numeroSilla);
-				    s.setEstaReservada(false);
-				    funcion.setGanancias(funcion.getGanancias()-s.getCosto());
-				    
-				    
-				    Espectaculo es = tm.buscarEspectaculoPorId(funcion.getId_espectaculo());
-				    es.setRentabilidad(es.getRentabilidad() - s.getCosto());
-				}
-				else
-				{
-					throw new Exception("No existe una reserva para esa silla");
-				}
+				note=tm.devolverBoleta(idBoleta, id);
 
 			} catch (Exception e) {
 				return Response.status(500).entity(doErrorMessage(e)).build();
 			}
-			return Response.status(200).entity(reserva).build();
-		} else return null;
-		
+		} else return Response.status(500).entity(doErrorMessage(new Exception("El usuario tiene que ser rol espectador y estar registrado"))).build();
+
+		return Response.status(200).entity(note).build();
 	}
 	
 
@@ -299,46 +233,24 @@ public class ReservaServices {
 	 * @return
 	 * @throws Exception
 	 */
-	@PUT
-	@Path("usuario/{idUsuario}/evento/{idEvento}/devolverAbono/{numeroSilla}")
-	@Consumes(MediaType.APPLICATION_JSON)
+	@GET
+	@Path("devolverAbono")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response devolverAbonoBoleta(@javax.ws.rs.PathParam("idUsuario") int idUsuario, @javax.ws.rs.PathParam("idEvento") int idEvento,@javax.ws.rs.PathParam("numeroSilla") int numeroSilla) throws Exception {
+	public Response devolverAbonoBoleta(@QueryParam("id") int id, @QueryParam("idReserva") int idReserva) throws Exception {
 		FestivAndesMaster tm = new FestivAndesMaster(getPath());
-		Usuario a = tm.buscarUsuariosPorId(idUsuario);
-		if(a.getRol()==Usuario.ROL_ESPECTADOR){
-			Reserva reserva = new Reserva(idUsuario, idEvento, numeroSilla);
-			Funcion funcion = tm.buscarEventoPorId(idEvento);
-			
-			
-			long time = System.currentTimeMillis();
-			java.sql.Date today = new java.sql.Date(time);
+		Usuario a = tm.buscarUsuariosPorId(id);
+		Espectador esp = tm.buscarEspectadorPorId(id);
+		if((a.getRol().compareTo(Usuario.ROL_ESPECTADOR)==0)&&(esp.isEstaRegistrado())){
+
 			try {
-				
-				//La ultima condicion dice que hay 3 semanas de diferencia entre hoy y el evento || funcion.getFecha().getTime() - today.getTime() >= 3 semanas* 7 dias a la semana * 86,400,000 millisegundos al dia)
-				if(tm.buscarSillasPorNumero(numeroSilla).isEstaReservada() == false && funcion.getFecha().before(today) == true && funcion.getFecha().getTime() - today.getTime() >= (3*7*86400000) )
-				{
-					devolverBoleta(idUsuario, idEvento, numeroSilla);
-					tm.deleteAbono(numeroSilla);
-				    Silla s = tm.buscarSillasPorNumero(numeroSilla);
-				   
-				    //Como devolverBoleta disminuye las ganancias pero en abono nunca se sumo eso, ac� se le agrega esa resta
-				    funcion.setGanancias(funcion.getGanancias()-(s.getCosto()*0.2));
-				    
-				    Espectaculo es = tm.buscarEspectaculoPorId(funcion.getId_espectaculo());
-				    es.setRentabilidad(es.getRentabilidad() - (s.getCosto()*0.2));
-				}
-				else
-				{
-					throw new Exception("La silla ya est� reservada o se acabo el plazo para abonar en esta reserva");
-				}
+				esp=tm.devolverAbono(id,idReserva);
 
 			} catch (Exception e) {
 				return Response.status(500).entity(doErrorMessage(e)).build();
 			}
-			return Response.status(200).entity(reserva).build();
-		} else return null;
-		
+		} else return Response.status(500).entity(doErrorMessage(new Exception("El usuario tiene que ser rol espectador."))).build();
+
+		return Response.status(200).entity(esp).build();
 	}
 	
 	

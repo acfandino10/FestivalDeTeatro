@@ -239,7 +239,8 @@ public class DAOTablaSitios {
 			Date fecha = rs.getDate("FECHA");
 			Timestamp hora = rs.getTimestamp("HORA");
 			int id_sitio2 = Integer.parseInt(rs.getString("ID_SITIO"));
-			Funcion eventoNuevo = new Funcion(id, fecha, id_espectaculo, hora, id_sitio2);
+			String estado = rs.getString("ESTADO");
+			Funcion eventoNuevo = new Funcion(id, fecha, id_espectaculo, hora, id_sitio2,estado);
 			eventoNuevo.setDisponibilidad(Boolean.parseBoolean(rs.getString("DISPONIBILIDAD")));
 			eventoNuevo.setGanancias(Double.parseDouble(rs.getString("GANANCIAS")));
 			sitios.add(eventoNuevo);

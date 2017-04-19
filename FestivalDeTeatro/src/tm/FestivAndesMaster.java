@@ -3,11 +3,11 @@ package tm;
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.Date;
 
 import dao.DAOTablaBancos;
 import dao.DAOTablaCategorias;
@@ -17,7 +17,7 @@ import dao.DAOTablaEspectadores;
 import dao.DAOTablaFunciones;
 import dao.DAOTablaPreferencias;
 import dao.DAOTablaRepresentantes;
-import dao.DAOTablaReserva;
+import dao.DAOTablaReservas;
 import dao.DAOTablaSillas;
 import dao.DAOTablaSitios;
 import dao.DAOTablaUsuarios;
@@ -27,6 +27,7 @@ import vos.Compania;
 import vos.Espectaculo;
 import vos.Espectador;
 import vos.Funcion;
+import vos.NotaDebito;
 import vos.Preferencia;
 import vos.Representante;
 import vos.Reserva;
@@ -1123,7 +1124,7 @@ public class FestivAndesMaster {
 		 * @return Lista - objeto que modela  un arreglo de objetos. este arreglo contiene el resultado de la búsqueda
 		 * @throws Exception -  cualquier error que se genere durante la transacción
 		 */
-		public ArrayList<Funcion> darEventos() throws Exception {
+		public ArrayList<Funcion> darFunciones() throws Exception {
 			ArrayList<Funcion> lista;
 			DAOTablaFunciones dao = new DAOTablaFunciones();
 			try 
@@ -1131,7 +1132,7 @@ public class FestivAndesMaster {
 				//////Transacción
 				this.conn = darConexion();
 				dao.setConn(conn);
-				lista = dao.darEventos();
+				lista = dao.darFunciones();
 
 			} catch (SQLException e) {
 				System.err.println("SQLException:" + e.getMessage());
@@ -1195,14 +1196,14 @@ public class FestivAndesMaster {
 		
 		
 		public ArrayList<Funcion> buscarEventosPorFecha(Date fecha) throws Exception {
-			ArrayList<Funcion> lista;
+			ArrayList<Funcion> lista=null;
 			DAOTablaFunciones dao = new DAOTablaFunciones();
 			try 
 			{
 				//////Transacción
 				this.conn = darConexion();
 				dao.setConn(conn);
-				lista = dao.buscarEventoPorFecha(fecha);
+				//lista = dao.buscarEventoPorFecha(fecha);
 
 			} catch (SQLException e) {
 				System.err.println("SQLException:" + e.getMessage());
@@ -1378,14 +1379,14 @@ public class FestivAndesMaster {
 		 * @param objeto - a eliminar. objeto != null
 		 * @throws Exception - cualquier error que se genera actualizando los videos
 		 */
-		public void deleteEvento(Funcion objeto) throws Exception {
+		public void deleteFuncion(int id) throws Exception {
 			DAOTablaFunciones dao = new DAOTablaFunciones();
 			try 
 			{
 				//////Transacción
 				this.conn = darConexion();
 				dao.setConn(conn);
-				dao.deleteEvento(objeto);
+				dao.deleteFuncion(id);
 
 			} catch (SQLException e) {
 				System.err.println("SQLException:" + e.getMessage());
@@ -1409,7 +1410,7 @@ public class FestivAndesMaster {
 		}
 		
 		
-     public Funcion buscarEventoPorId(int id) throws SQLException {
+     public Funcion buscarFuncionPorId(int id) throws SQLException {
 			
     	 Funcion funcion = null;
     	
@@ -1419,7 +1420,7 @@ public class FestivAndesMaster {
 				//////Transacción
 				this.conn = darConexion();
 				dao.setConn(conn);
-				funcion = dao.buscarEventoPorId(id);
+				funcion = dao.buscarFuncionPorId(id);
 
 			} catch (SQLException e) {
 				System.err.println("SQLException:" + e.getMessage());
@@ -2526,7 +2527,7 @@ public class FestivAndesMaster {
 			
 				public ArrayList<Reserva> darReservas() throws Exception {
 					ArrayList<Reserva> lista;
-					DAOTablaReserva dao = new DAOTablaReserva();
+					DAOTablaReservas dao = new DAOTablaReservas();
 					try 
 					{
 						//////Transacción
@@ -2562,15 +2563,15 @@ public class FestivAndesMaster {
 				 * @return Lista - objeto que modela  un arreglo. este arreglo contiene el resultado de la búsqueda
 				 * @throws Exception -  cualquier error que se genere durante la transacción
 				 */
-				public ArrayList<Reserva> buscarReservasPorEvento(int id) throws Exception {
+				public ArrayList<Reserva> buscarReservasPorFuncion(int id) throws Exception {
 					ArrayList<Reserva> lista;
-					DAOTablaReserva dao = new DAOTablaReserva();
+					DAOTablaReservas dao = new DAOTablaReservas();
 					try 
 					{
 						//////Transacción
 						this.conn = darConexion();
 						dao.setConn(conn);
-						lista = dao.buscarReservaPorEvento(id);
+						lista = dao.buscarReservaPorFuncion(id);
 
 					} catch (SQLException e) {
 						System.err.println("SQLException:" + e.getMessage());
@@ -2601,7 +2602,7 @@ public class FestivAndesMaster {
 				 * @throws Exception - cualquier error que se genera agregando el objeto
 				 */
 				public void addReserva(Reserva objeto) throws Exception {
-					DAOTablaReserva dao = new DAOTablaReserva();
+					DAOTablaReservas dao = new DAOTablaReservas();
 					try 
 					{
 						//////Transacción
@@ -2638,7 +2639,7 @@ public class FestivAndesMaster {
 				 * @throws Exception - cualquier error que se genera agregando los objetos
 				 */
 				public void addReservas(ArrayList<Reserva> objetos) throws Exception {
-					DAOTablaReserva dao = new DAOTablaReserva();
+					DAOTablaReservas dao = new DAOTablaReservas();
 					try 
 					{
 						//////Transacción - ACID Example
@@ -2678,7 +2679,7 @@ public class FestivAndesMaster {
 				 * @throws Exception - cualquier error que se genera actualizando los objetos
 				 */
 				public void updateReserva(Reserva objeto) throws Exception {
-					DAOTablaReserva dao = new DAOTablaReserva();
+					DAOTablaReservas dao = new DAOTablaReservas();
 					try 
 					{
 						//////Transacción
@@ -2714,7 +2715,7 @@ public class FestivAndesMaster {
 				 * @throws Exception - cualquier error que se genera actualizando los videos
 				 */
 				public void deleteReserva(Reserva objeto) throws Exception {
-					DAOTablaReserva dao = new DAOTablaReserva();
+					DAOTablaReservas dao = new DAOTablaReservas();
 					try 
 					{
 						//////Transacción
@@ -3331,13 +3332,13 @@ public class FestivAndesMaster {
 		     
 		     
 			public void addAbono(int silla) throws Exception {
-				DAOTablaReserva dao = new DAOTablaReserva();
+				DAOTablaReservas dao = new DAOTablaReservas();
 				try 
 				{
 					//////Transacción
 					this.conn = darConexion();
 					dao.setConn(conn);
-					dao.addAbono(silla);
+					//dao.addAbono(silla);
 					conn.commit();
 
 				} catch (SQLException e) {
@@ -3363,13 +3364,13 @@ public class FestivAndesMaster {
 			
 			
 			public void deleteAbono(int silla) throws Exception {
-				DAOTablaReserva dao = new DAOTablaReserva();
+				DAOTablaReservas dao = new DAOTablaReservas();
 				try 
 				{
 					//////Transacción
 					this.conn = darConexion();
 					dao.setConn(conn);
-					dao.deleteAbono(silla);
+					//dao.deleteAbono(silla);
 					conn.commit();
 
 				} catch (SQLException e) {
@@ -3521,6 +3522,394 @@ public class FestivAndesMaster {
 					}
 				}
 				return lista;
+			}
+
+			public ArrayList<Funcion> darFuncionesRealizadasEspectador(int id) throws SQLException {
+				ArrayList<Funcion> lista;
+				DAOTablaFunciones dao = new DAOTablaFunciones();
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					lista = dao.darFuncionesRealizadasEspectador(id);
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return lista;
+			}
+
+			public ArrayList<Funcion> darFuncionesEnCursoEspectador(int id) throws SQLException {
+				ArrayList<Funcion> lista;
+				DAOTablaFunciones dao = new DAOTablaFunciones();
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					lista = dao.darFuncionesEnCursoEspectador(id);
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return lista;
+			}
+			
+			public ArrayList<Funcion> darFuncionesPrevistasEspectador(int id) throws SQLException {
+				ArrayList<Funcion> lista;
+				DAOTablaFunciones dao = new DAOTablaFunciones();
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					lista = dao.darFuncionesPrevistasEspectador(id);
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return lista;
+			}
+
+			public ArrayList<Silla> darSillasCanceladas(int idEspectador, int idFuncion) throws SQLException {
+				ArrayList<Silla> lista;
+				DAOTablaSillas dao = new DAOTablaSillas();
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					lista = dao.darSillasCanceladas(idEspectador, idFuncion);
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return lista;
+			}
+
+			public ArrayList<Funcion> darFuncionesCanceladas(int id) throws SQLException {
+				ArrayList<Funcion> lista;
+				DAOTablaFunciones dao = new DAOTablaFunciones();
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					lista = dao.darFuncionesCanceladas(id);
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return lista;
+			}
+
+			public ArrayList<Espectador> darEspectadoresDeFuncionYDevolverCosto(int idFuncion) throws SQLException {
+				ArrayList<Espectador> lista;
+				DAOTablaEspectadores dao = new DAOTablaEspectadores();
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					lista = dao.darEspectadoresDeFuncionYDevolverCosto(idFuncion);
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return lista;
+			}
+
+			public ArrayList<Reserva> darReservasFuncionYCancelarlas(int idFuncion) throws SQLException {
+				ArrayList<Reserva> lista;
+				DAOTablaReservas dao = new DAOTablaReservas();
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					lista = dao.darReservasFuncionYCancelarlas(idFuncion);
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return lista;
+			}
+
+			public Reserva buscarReservasPorId(int idReserva) throws SQLException {
+				Reserva reserva;
+				DAOTablaReservas dao = new DAOTablaReservas();
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					reserva = dao.darReservasPorId(idReserva);
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return reserva;
+			}
+			public Silla cancelarReserva(int idReserva) throws SQLException,Exception{
+				DAOTablaSillas dao = new DAOTablaSillas();
+				Silla silla;
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					Reserva res= buscarReservasPorId(idReserva);
+					res.setEstado(Reserva.ESTADO_CANCELADA);
+					updateReserva(res);
+					silla = dao.cancelarFuncionSillaPorReserva(idReserva); 
+					if(silla!=null){
+						updateSilla(silla);
+					}
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return silla;
+			}
+
+			public Espectador devolverAbono(int id, int idReserva) throws SQLException, Exception {
+
+				Espectador espectador;
+				DAOTablaReservas dao = new DAOTablaReservas();
+				DAOTablaEspectadores daoEsp = new DAOTablaEspectadores();
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					Date fechaReserva = dao.darFechaReserva(idReserva);
+					daoEsp.setConn(conn);
+					long DAY_IN_MS = 1000 * 60 * 60 * 24;
+					Date thatDay = new Date(System.currentTimeMillis() + (7 * 3 * DAY_IN_MS));
+					
+					if(fechaReserva.after(thatDay)){
+						
+						Silla silla =cancelarReserva(idReserva);
+						espectador = buscarEspectadorPorId(id);
+						espectador.setSaldo(0.0);
+						updateEspectador(espectador);
+						
+					}else throw new Exception("El plazo para devolver el abono de la boleta es únicamente hasta 3 semanas antes del evento.");
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						daoEsp.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return espectador;
+			}
+
+			public NotaDebito devolverBoleta(int idReservaBoleta, int id) throws SQLException,Exception {
+				DAOTablaReservas dao = new DAOTablaReservas();
+				NotaDebito note;
+				Espectador espectador;
+				Silla silla;
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);
+					Date fechaReserva = dao.darFechaReserva(idReservaBoleta);
+					long DAY_IN_MS = 1000 * 60 * 60 * 24;
+					Date thatDay = new Date(System.currentTimeMillis() + (5 * DAY_IN_MS));
+					
+					if(fechaReserva.after(thatDay)){
+						
+						silla =cancelarReserva(idReservaBoleta);
+						espectador = buscarEspectadorPorId(id);
+						espectador.setSaldo(silla.getCosto());
+						updateEspectador(espectador);
+						note=new NotaDebito(DAY_IN_MS, espectador.getNombre(), new Date(System.currentTimeMillis()),
+								"Motivos personales por los cuales el espectador con ID:"+id+" decide devolver la boleta y se cancela la reserva"+
+								"cuyo valor era de "+silla.getCosto(), silla.getCosto(), "13%", silla.getCosto()*(100-13)/100);
+					}else throw new Exception("El plazo para devolver la boleta es 5 días antes del evento.");
+
+
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+				return note;
 			}
 				
 }

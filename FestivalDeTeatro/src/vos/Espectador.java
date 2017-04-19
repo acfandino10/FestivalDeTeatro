@@ -46,15 +46,15 @@ public class Espectador extends Usuario{
 	/**
 	 * Banco de la tarjeta del usuario
 	 */
-	@JsonProperty(value="bancoTarjeta")
-	private int id_bancoTarjeta;
+	@JsonProperty(value="saldo")
+	private double saldo;
 
 	
 
 	/**
 	 * Metodo constructor de la clase espectador
 	 */
-	public Espectador(@JsonProperty(value="id")int id, @JsonProperty(value="nombre")String nombre,@JsonProperty(value="correo") String correo, @JsonProperty(value="password") String password, @JsonProperty(value="tarjeta") String tarjeta, @JsonProperty(value="estaRegistrado") boolean estaRegistrado, @JsonProperty(value="bancoTarjeta") int bancoTarjeta) {
+	public Espectador(@JsonProperty(value="id")int id, @JsonProperty(value="nombre")String nombre,@JsonProperty(value="correo") String correo, @JsonProperty(value="password") String password, @JsonProperty(value="tarjeta") String tarjeta, @JsonProperty(value="estaRegistrado") boolean estaRegistrado, @JsonProperty(value="saldo") double saldo) {
 		super(id, nombre, correo, password, "ROL_ESPECTADOR");
 		this.id = id;
 		this.nombre = nombre;
@@ -62,7 +62,7 @@ public class Espectador extends Usuario{
 		this.password = password;
 		this.tarjeta = tarjeta;
 		this.estaRegistrado = estaRegistrado;
-		this.id_bancoTarjeta = bancoTarjeta;
+		this.saldo = saldo;
 	}
 
    //Getters and Setters
@@ -70,6 +70,10 @@ public class Espectador extends Usuario{
 	
 	public int getId() {
 		return id;
+	}
+	
+	public void setSaldo(double saldo){
+		this.saldo=saldo;
 	}
 
 	public void setId(int id) {
@@ -116,12 +120,12 @@ public class Espectador extends Usuario{
 		this.estaRegistrado = estaRegistrado;
 	}
 
-	public int getBancoTarjeta() {
-		return id_bancoTarjeta;
+	public double getSaldo() {
+		return saldo;
 	}
 
-	public void setBancoTarjeta(int bancoTarjeta) {
-		this.id_bancoTarjeta = bancoTarjeta;
+	public void setBancoTarjeta(double saldo) {
+		this.saldo = saldo;
 	}
 
 }

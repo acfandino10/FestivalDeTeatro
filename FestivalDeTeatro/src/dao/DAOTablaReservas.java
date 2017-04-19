@@ -1,17 +1,19 @@
 package dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import oracle.net.aso.s;
+import vos.Espectador;
 import vos.Funcion;
 import vos.Reserva;
 import vos.Silla;
 
-public class DAOTablaReserva {
+public class DAOTablaReservas {
 	/**
 	 * Arraylits de recursos que se usan para la ejecución de sentencias SQL
 	 */
@@ -26,7 +28,7 @@ public class DAOTablaReserva {
 	 * Método constructor que crea DAOCreacion
 	 * <b>post: </b> Crea la instancia del DAO e inicializa el Arraylist de recursos
 	 */
-	public DAOTablaReserva() {
+	public DAOTablaReservas() {
 		recursos = new ArrayList<Object>();
 	}
 
@@ -72,9 +74,10 @@ public class DAOTablaReserva {
 
 		while (rs.next()) {
 			int id_espectador = Integer.parseInt(rs.getString("ID_ESPECTADOR"));
-			int id_evento = Integer.parseInt(rs.getString("ID_EVENTO"));
-			int numero_silla = Integer.parseInt(rs.getString("NUMEROSILLA"));
-			r.add(new Reserva(id_espectador, id_evento, numero_silla));
+			int id_evento = Integer.parseInt(rs.getString("ID_FUNCION"));
+			String estado = rs.getString("ESTADOACTIVE");
+			int id = Integer.parseInt(rs.getString("ID"));
+			r.add(new Reserva(id_espectador, id_evento,estado,id));
 		}
 		return r;
 	}
@@ -87,10 +90,10 @@ public class DAOTablaReserva {
 	 * @throws SQLException - Cualquier error que la base de datos arroje.
 	 * @throws Exception - Cualquier error que no corresponda a la base de datos
 	 */
-	public ArrayList<Reserva> buscarReservaPorEvento(int id_evento) throws SQLException, Exception {
+	public ArrayList<Reserva> buscarReservaPorFuncion(int idFuncion) throws SQLException, Exception {
 		ArrayList<Reserva> lista = new ArrayList<Reserva>();
 
-		String sql = "SELECT * FROM ISIS2304B071710.RESERVAS WHERE ID_EVENTO ='" + id_evento + "'";
+		String sql = "SELECT * FROM ISIS2304B071710.RESERVAS WHERE ID_FUNCION ='" + idFuncion + "'";
 
 		System.out.println("SQL stmt:" + sql);
 
@@ -100,9 +103,10 @@ public class DAOTablaReserva {
 
 		while (rs.next()) {
 			int id_espectador = Integer.parseInt(rs.getString("ID_ESPECTADOR"));
-			int id_evento2 = Integer.parseInt(rs.getString("ID_EVENTO"));
-			int numero_silla = Integer.parseInt(rs.getString("NUMEROSILLA"));
-			lista.add(new Reserva(id_espectador, id_evento2, numero_silla));
+			int id_evento2 = Integer.parseInt(rs.getString("ID_FUNCION"));
+			String estado = rs.getString("ESTADOACTIVE");
+			int id = Integer.parseInt("ID");
+			lista.add(new Reserva(id_espectador, id_evento2,estado,id));
 		}
 
 		return lista;
@@ -120,9 +124,9 @@ public class DAOTablaReserva {
 
 		String sql = "INSERT INTO ISIS2304MO11620.RESERVAS VALUES (";
 		sql += objeto.getId_espectador() + ",";
-		sql += objeto.getId_evento() + ",";
-		sql += objeto.getNumero_silla() + ",";
-		sql += objeto.getAbono() + ")";
+		sql += objeto.getIdFuncion() + ",";
+		sql += objeto.getEstado() + ",";
+		sql += objeto.getId() + ")";
 
 		System.out.println("SQL stmt:" + sql);
  
@@ -142,11 +146,9 @@ public class DAOTablaReserva {
 	 */
 	public void updateReserva(Reserva objeto) throws SQLException, Exception {
 
-		String sql = "UPDATE ISIS2304MO11620.RESERVAS SET ";
-		sql += "id_espectador" + objeto.getId_espectador();
-		sql += "id_evento = " + objeto.getId_evento();
-		sql += "abono = " + objeto.getAbono();
-		sql += " WHERE numerosilla = " + objeto.getNumero_silla();
+		String sql = "UPDATE ISIS2304B071710.RESERVAS SET ";
+		sql += "estadoactive='" + objeto.getEstado();
+		sql += "' WHERE ID=" + objeto.getId();
 		
 
 		System.out.println("SQL stmt:" + sql);
@@ -168,8 +170,7 @@ public class DAOTablaReserva {
 
 		String sql = "DELETE FROM ISIS2304B071710.RESERVAS";
 		sql += " WHERE id_espectador = " + objeto.getId_espectador() +
-		"AND id_evento = " + objeto.getId_evento() +
-		"AND numerosilla = " + objeto.getNumero_silla();
+		"AND id_funcion = " + objeto.getIdFuncion();
 
 		System.out.println("SQL stmt:" + sql);
 
@@ -178,26 +179,6 @@ public class DAOTablaReserva {
 		prepStmt.executeQuery();
 	}
 	
-	public Reserva buscarReservaPorSilla(int silla) throws SQLException, Exception {
-		Reserva l = null;
-
-		String sql = "SELECT * FROM ISIS2304B071710.RESERVAS WHERE NUMEROSILLA ='" + silla + "'";
-
-		System.out.println("SQL stmt:" + sql);
-
-		PreparedStatement prepStmt = conn.prepareStatement(sql);
-		recursos.add(prepStmt);
-		ResultSet rs = prepStmt.executeQuery();
-
-		while (rs.next()) {
-			int id_espectador = Integer.parseInt(rs.getString("ID_ESPECTADOR"));
-			int id_evento = Integer.parseInt(rs.getString("ID_EVENTO"));
-			int numero_silla = Integer.parseInt(rs.getString("NUMEROSILLA"));
-			l = new Reserva(id_espectador, id_evento, numero_silla);
-		}
-
-		return l;
-	}
 
 	public ArrayList<Reserva> buscarReservaPorEspectador(int id_espectador) throws SQLException, Exception {
 		ArrayList<Reserva> lista = new ArrayList<Reserva>();
@@ -211,57 +192,89 @@ public class DAOTablaReserva {
 		ResultSet rs = prepStmt.executeQuery();
 
 		while (rs.next()) {
-			int id_espectador2 = Integer.parseInt(rs.getString("ESPECTADOR"));
-			int id_evento = Integer.parseInt(rs.getString("EVENTO"));
-			int numero_silla = Integer.parseInt(rs.getString("NUMERO_SILLA"));
-			lista.add(new Reserva(id_espectador2, id_evento, numero_silla));
+			int id_espectador2 = Integer.parseInt(rs.getString("ID_ESPECTADOR"));
+			int id_evento = Integer.parseInt(rs.getString("ID_FUNCION"));
+			String estado = rs.getString("ESTADOACTIVE");
+			int id = Integer.parseInt("ID");
+			lista.add(new Reserva(id_espectador2, id_evento,estado,id));
 		}
 
 		return lista;
 	}
 	
-	//TODO se debe agregar en las tablas y en el UML un atributo en reserva que se llame abono
-	public double addAbono(int numero) throws SQLException, Exception{
-		DAOTablaSillas sillas = new DAOTablaSillas();
-		Silla silla = sillas.buscarSillasPorNumero(numero);
-		double abono = silla.getCosto()*0.2; 
-		
-		if(!silla.isEstaReservada()){
-		String sql = "UPDATE ISIS2304MO11620.RESERVAS SET ";
-		sql += "abono" + abono;
-		sql += " WHERE numero_silla = " + numero;
-		
+	
+	
 
-		System.out.println("SQL stmt:" + sql);
+	public ArrayList<Reserva> darReservasFuncionYCancelarlas(int idFuncion) throws NumberFormatException, SQLException {
+		System.out.println("-------COMIENZA A DAR RESERVAS POR FUNCION Y CANCELARLAS------");
+		ArrayList<Reserva> reservas = new ArrayList<Reserva>();
+
+		String sql = "SELECT * FROM ISIS2304B071710.RESERVAS reserva "
+				+ "INNER JOIN ISIS2304B071710.ESPECTADORES espectador "
+				+ "ON espectador.ID=reserva.ID_ESPECTADOR "
+				+ "WHERE reserva.ESTADOACTIVE='ESTADO_ACTIVA' AND reserva.ID_FUNCION="+idFuncion;
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
-		prepStmt.executeQuery();
-		
-		return abono;		
-	 }
-		else{
-			throw new Exception("No hay disponibilidad"); 
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			int idEspectador = Integer.parseInt(rs.getString("ID_ESPECTADOR"));
+			int idFuncionNueva = Integer.parseInt(rs.getString("ID_FUNCION"));
+			String estado = Reserva.ESTADO_CANCELADA;
+			int id=Integer.parseInt(rs.getString("ID"));
+			reservas.add(new Reserva(idEspectador, idFuncionNueva,estado,id));
 		}
-		
+		System.out.println("-------TERMINA DE DAR RESERVAS POR FUNCION Y CANCELARLAS--------");
+		return reservas;
 	}
-	
-	
-	public void deleteAbono(int numero) throws SQLException, Exception{
-		double abono = 0.0; 
-		
-		String sql = "UPDATE ISIS2304MO11620.RESERVAS SET ";
-		sql += "abono" + abono;
-		sql += " WHERE numero_silla = " + numero;
-		
+
+	public Reserva darReservasPorId(int idReserva) throws SQLException {
+		Reserva reserva = null;
+
+		String sql = "SELECT * FROM ISIS2304B071710.RESERVAS WHERE ID =" + idReserva;
 
 		System.out.println("SQL stmt:" + sql);
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
-		prepStmt.executeQuery();		
-	 
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			int id_espectador = Integer.parseInt(rs.getString("ID_ESPECTADOR"));
+			int id_evento2 = Integer.parseInt(rs.getString("ID_FUNCION"));
+			String estado = rs.getString("ESTADOACTIVE");
+			int id = Integer.parseInt(rs.getString("ID"));
+			reserva=new Reserva(id_espectador, id_evento2,estado,id);
+		}
+
+		return reserva;
 	}
+
+	public Date darFechaReserva(int idReserva) throws SQLException {
+		Date fechaReserva = null;
+
+		String sql = "SELECT * FROM ISIS2304B071710.RESERVAS reserva "
+				+ "INNER JOIN ISIS2304B071710.ESPECTADORES espectador "
+				+ "ON espectador.ID=reserva.ID_ESPECTADOR "
+				+ "INNER JOIN ISIS2304B071710.FUNCIONES funcion "
+				+ "ON funcion.ID=reserva.ID_FUNCION "
+				+ "WHERE reserva.ID='" + idReserva + "'";
+
+		System.out.println("SQL stmt:" + sql);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			fechaReserva=rs.getDate("FECHA");
+		}
+
+		return fechaReserva;
+	}
+
+	
 	
 	
 	

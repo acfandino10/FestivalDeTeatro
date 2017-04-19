@@ -282,11 +282,11 @@ public class DAOTablaEspectaculo {
 		
 		
 	
-	for(Funcion ev : daoEv.darEventos()){
+	for(Funcion funcion : daoEv.darFunciones()){
 			
-			if(ev.getId_espectaculo() == id_espectaculo && ev.getId_sitio() == id_sitio)
+			if(funcion.getId_espectaculo() == id_espectaculo && funcion.getId_sitio() == id_sitio)
 			{
-				ganancias += ev.getGanancias();
+				ganancias += funcion.getGanancias();
 			}
 						
 		}
@@ -298,14 +298,14 @@ public class DAOTablaEspectaculo {
 	public double reporteEspectaculoEspectador(int id_espectaculo, int id_espectador) throws SQLException, Exception
 	{
 		double ganancias = 0.0;
-		DAOTablaReserva daoEspectador = new DAOTablaReserva();
+		DAOTablaReservas daoEspectador = new DAOTablaReservas();
 		DAOTablaFunciones daoEv = new DAOTablaFunciones();
 		
 		ArrayList<Reserva> cliente = daoEspectador.buscarReservaPorEspectador(id_espectador);
 		
     	  for(Reserva s : cliente){
     		  
-    		  for(Funcion ev : daoEv.darEventos()){
+    		  for(Funcion ev : daoEv.darFunciones()){
     				
     				if(ev.getId_espectaculo() == id_espectaculo && s.getId_espectador()==id_espectador)
     				{
@@ -342,7 +342,8 @@ public class DAOTablaEspectaculo {
 				Date fecha = rs.getDate("FECHA");
 				Timestamp hora = rs.getTimestamp("HORA");
 				int id_sitio = Integer.parseInt(rs.getString("ID_SITIO"));
-				Funcion eventoNuevo = new Funcion(id, fecha, id_espectaculo2, hora, id_sitio);
+				String estado=rs.getString("ESTADO");
+				Funcion eventoNuevo = new Funcion(id, fecha, id_espectaculo2, hora, id_sitio,estado);
 				sitios.add(eventoNuevo);
 			}
 

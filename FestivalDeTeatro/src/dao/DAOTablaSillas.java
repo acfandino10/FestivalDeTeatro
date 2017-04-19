@@ -1,13 +1,18 @@
 package dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
-import vos.Silla;
+import javax.ws.rs.Path;
 
+import vos.Espectador;
+import vos.Funcion;
+import vos.Silla;
 
 
 public class DAOTablaSillas {
@@ -152,10 +157,13 @@ public class DAOTablaSillas {
 
 		String sql = "UPDATE ISIS2304B071710.SILLAS SET ";
 		
-		sql += "estaReservada" + silla.isEstaReservada();
-		sql += "costo" + silla.getCosto();
-		sql += "localidad" + silla.getLocalidad();
-		sql += "id_sitio" + silla.getId_sitio();
+		int resp=0;
+		if(silla.isEstaReservada()) resp=1;
+		sql += "estaReservada=" + resp;
+		sql += ",costo=" + silla.getCosto();
+		sql += ",localidad='" + silla.getLocalidad();
+		sql += "',id_sitio=" + silla.getId_sitio();
+		sql += ",id_reserva="+silla.getIdReserva();
 		sql += " WHERE numero = " + silla.getNumero();
 
 		System.out.println("SQL stmt:" + sql);
@@ -236,7 +244,54 @@ public class DAOTablaSillas {
 		return sillas;
 	}
 	
-	
+	public ArrayList<Silla> darSillasCanceladas(int idEspectador, int idFuncion) throws SQLException{
+		ArrayList<Silla> sillas = new ArrayList<Silla>();
+
+		String sql = "SELECT silla.* FROM ISIS2304B071710.FUNCIONES fun "
+				+"INNER JOIN ISIS2304B071710.RESERVAS res ON fun.ID=res.ID_FUNCION "
+				+"INNER JOIN ISIS2304B071710.SILLAS silla ON res.NUMEROSILLA=silla.NUMERO "
+				+"INNER JOIN ISIS2304B071710.ESPECTADORES esp ON res.ID_ESPECTADOR=esp.ID "
+				+"WHERE esp.ESTAREGISTRADO=1 AND res.ESTADOACTIVE='ESTADO_CANCELADA' AND esp.ID='"+idEspectador+"' AND fun.ID='"+idFuncion+"'";
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			int numero = Integer.parseInt(rs.getString("NUMERO"));
+			double costo = Double.parseDouble(rs.getString("COSTO"));
+			String localidad = rs.getString("LOCALIDAD");
+			int id_sitio = Integer.parseInt(rs.getString("ID_SITIO"));
+			Silla toAdd = new Silla(numero, costo, localidad, id_sitio);
+			toAdd.setEstaReservada(Boolean.parseBoolean(rs.getString("ESTARESERVADA")));
+			sillas.add(toAdd);
+		}
+			
+		return sillas;
+	}
+
+	public Silla cancelarFuncionSillaPorReserva(int idReserva) throws SQLException {
+		Silla silla = null;
+
+		String sql = "SELECT * FROM ISIS2304B071710.RESERVAS reserva "
+				+"INNER JOIN ISIS2304B071710.SILLAS silla "
+				+"ON silla.ID_RESERVA=reserva.ID WHERE reserva.ID="+idReserva;
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			int numero = Integer.parseInt(rs.getString("NUMERO"));
+			double costo = Double.parseDouble(rs.getString("COSTO"));
+			String localidad = rs.getString("LOCALIDAD");
+			int id_sitio = Integer.parseInt(rs.getString("ID_SITIO"));
+			silla = new Silla(numero, costo, localidad, id_sitio);
+			silla.setEstaReservada(false);
+		}
+			
+		return silla;
+	}
 	
 	
 	
