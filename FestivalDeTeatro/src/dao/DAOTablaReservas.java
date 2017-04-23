@@ -111,30 +111,6 @@ public class DAOTablaReservas {
 
 		return lista;
 	}
-
-	/**
-	 * Método que agrega la reserva que entra como parámetro a la base de datos.
-	 * @param reserva a agregar. 
-	 * <b> post: </b> se ha agregado a la base de datos en la transaction actual. pendiente que el video master
-	 * haga commit para que baje  a la base de datos.
-	 * @throws SQLException - Cualquier error que la base de datos arroje. No pudo agregar el video a la base de datos
-	 * @throws Exception - Cualquier error que no corresponda a la base de datos
-	 */
-	public void addReserva(Reserva objeto) throws SQLException, Exception {
-
-		String sql = "INSERT INTO ISIS2304MO11620.RESERVAS VALUES (";
-		sql += objeto.getId_espectador() + ",";
-		sql += objeto.getIdFuncion() + ",";
-		sql += objeto.getEstado() + ",";
-		sql += objeto.getId() + ")";
-
-		System.out.println("SQL stmt:" + sql);
- 
-		PreparedStatement prepStmt = conn.prepareStatement(sql);
-		recursos.add(prepStmt);
-		prepStmt.executeQuery();
-
-	}
 	
 	/**
 	 * Método que actualiza la reserva que entra como parámetro en la base de datos.
@@ -274,6 +250,33 @@ public class DAOTablaReservas {
 		return fechaReserva;
 	}
 
+	//TODO
+	
+		/**
+		 * Método que agrega la reserva que entra como parámetro a la base de datos.
+		 * @param reserva a agregar. 
+		 * <b> post: </b> se ha agregado a la base de datos en la transaction actual. pendiente que el video master
+		 * haga commit para que baje  a la base de datos.
+		 * @throws SQLException - Cualquier error que la base de datos arroje. No pudo agregar el video a la base de datos
+		 * @throws Exception - Cualquier error que no corresponda a la base de datos
+		 */
+		public void addReserva(Reserva objeto) throws SQLException, Exception {
+
+			String sql = "INSERT INTO ISIS2304B071710.RESERVAS VALUES (";
+
+			sql += objeto.getId_espectador() + ",";
+			sql += objeto.getIdFuncion() + ",'";
+			sql += objeto.getEstado() + "',";
+			sql += objeto.getId() + ")";
+			
+
+			System.out.println("SQL stmt:" + sql);
+	 
+			PreparedStatement prepStmt = conn.prepareStatement(sql);
+			recursos.add(prepStmt);
+			prepStmt.executeQuery();
+
+		}
 	
 	
 	

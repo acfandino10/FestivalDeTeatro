@@ -1410,39 +1410,45 @@ public class FestivAndesMaster {
 		}
 		
 		
-     public Funcion buscarFuncionPorId(int id) throws SQLException {
+     //TODO
+		public Funcion buscarFuncionPorId(int id, boolean conectado) throws SQLException {
 			
-    	 Funcion funcion = null;
-    	
-			DAOTablaFunciones dao = new DAOTablaFunciones();
-			try 
-			{
-				//////Transacción
-				this.conn = darConexion();
-				dao.setConn(conn);
-				funcion = dao.buscarFuncionPorId(id);
+	    	 Funcion funcion = null;
+	    	
+				DAOTablaFunciones dao = new DAOTablaFunciones();
+				try 
+				{
+					//////Transacción
+					if(!conectado){
+					this.conn = darConexion();
+					}
+					dao.setConn(conn);
+					funcion = dao.buscarFuncionPorId(id);
 
-			} catch (SQLException e) {
-				System.err.println("SQLException:" + e.getMessage());
-				e.printStackTrace();
-				throw e;
-			} catch (Exception e) {
-				System.err.println("GeneralException:" + e.getMessage());
-				e.printStackTrace();
-				throw e;
-			} finally {
-				try {
-					dao.cerrarRecursos();
-					if(this.conn!=null)
-						this.conn.close();
-				} catch (SQLException exception) {
-					System.err.println("SQLException closing resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+
+						dao.cerrarRecursos();
+						if(!conectado){
+						if(this.conn!=null)
+							this.conn.close();
+						}
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
 				}
+				return funcion;
 			}
-			return funcion;
-		}
 		
      
      public double reporteFuncionTotal(int id) throws SQLException {
@@ -2595,21 +2601,40 @@ public class FestivAndesMaster {
 					return lista;
 				}
 				
+				//TODO			
 				/**
 				 * Método que modela la transacción que agrega un solo objeto a la base de datos.
 				 * <b> post: </b> se ha agregado el objeto que entra como parámetro
 				 * @param objeto - el objeto  a agregar. objeto != null
 				 * @throws Exception - cualquier error que se genera agregando el objeto
 				 */
-				public void addReserva(Reserva objeto) throws Exception {
+				public Reserva addReserva(Reserva objeto) throws Exception {
+					System.out.println("COMEINZA METODO ADD RESERVA EN EL MASTER");
 					DAOTablaReservas dao = new DAOTablaReservas();
+					Reserva reserva=objeto;
 					try 
 					{
 						//////Transacción
 						this.conn = darConexion();
 						dao.setConn(conn);
-						dao.addReserva(objeto);
-						conn.commit();
+						System.out.println("LA CONEXION FUE EXITOSA----------------");
+												
+						Funcion funcion = buscarFuncionPorId(objeto.getIdFuncion(),true);
+						System.out.println("ENCONTRO LA FUNCION QUE BUSCABA: "+funcion.toString());
+							if(funcion.isDisponibilidad())
+							{
+								System.out.println("LA FUNCION ES DISPONIBLE Y POR LO TANTO SE COMIENZA A AGREGAR LA RESERVA");
+								dao.addReserva(objeto);
+								conn.commit();
+								System.out.println("No llega aca poruqe exception");
+							   
+							}else
+							{
+								System.out.println("COMIENZA A HACER ROLLBACK");
+								conn.rollback();
+								throw new Exception("No hay disponibilidad");								
+							}
+							
 
 					} catch (SQLException e) {
 						System.err.println("SQLException:" + e.getMessage());
@@ -2630,6 +2655,7 @@ public class FestivAndesMaster {
 							throw exception;
 						}
 					}
+					return reserva;
 				}
 				
 				/**
@@ -3910,6 +3936,124 @@ public class FestivAndesMaster {
 					}
 				}
 				return note;
+			}
+			
+			public void registrarCompraBoleta(Reserva objeto, int numeroSilla) throws Exception {
+				DAOTablaReservas dao = new DAOTablaReservas();
+				try 
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);					
+											
+					Funcion funcion = buscarFuncionPorId(objeto.getIdFuncion(),true);
+                    Silla s = buscarSillasPorNumero(numeroSilla);
+
+						if(funcion.isDisponibilidad() && s.isEstaReservada())
+						{
+							dao.addReserva(objeto);
+						    s.setEstaReservada(true);
+                            s.setIdReserva(objeto.getId());
+                       	    funcion.setGanancias(funcion.getGanancias()+s.getCosto());
+						    
+						    
+						  Espectaculo es = buscarEspectaculoPorId(funcion.getId_espectaculo());
+						  es.setRentabilidad(es.getRentabilidad() + s.getCosto());							
+						}
+						else
+						{
+							conn.rollback();
+							throw new Exception("No hay disponibilidad");								
+						}					
+					conn.commit();
+					
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+			}
+
+			public void registrarComprasBoletas(Reserva objeto, String localidad, int cantSillas) throws Exception {
+				DAOTablaReservas dao = new DAOTablaReservas();
+				try
+				{
+					//////Transacción
+					this.conn = darConexion();
+					dao.setConn(conn);					
+											
+					Funcion funcion = buscarFuncionPorId(objeto.getIdFuncion(),true);
+					ArrayList<Silla> s = buscarSillasPorLocalidad(localidad);
+						if(funcion.isDisponibilidad())
+						{						
+						   	int sillasReservadas = 0;
+						   	int ultimaPosicion = 0;
+							for(int i=0; i<s.size()&& sillasReservadas==cantSillas; i++){
+								
+							Silla s1 = s.get(i);
+							ultimaPosicion = i;
+							
+							if(!s1.isEstaReservada()) sillasReservadas++;							
+							else sillasReservadas=0;							
+							}
+							
+							if(sillasReservadas<cantSillas) 
+							{
+								conn.rollback();
+								throw new Exception("No hay suficientes sillas contiguas libres en esta localidad");
+							}
+							else
+							{
+						    dao.addReserva(objeto);
+						    int posicionSilla = ultimaPosicion;
+						    for(int i = 1; i<cantSillas; i++)
+						      {
+						    	 Silla s1 = s.get(posicionSilla);
+						    	 s1.setIdReserva(objeto.getId());
+						    	 s1.setEstaReservada(true);
+						    	 posicionSilla--;
+						      }
+							  }
+						}						
+						else
+						{
+							conn.rollback();
+							throw new Exception("No hay disponibilidad en esa funcion");								
+						}											
+					conn.commit();
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
 			}
 				
 }
