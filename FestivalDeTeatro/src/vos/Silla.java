@@ -104,4 +104,12 @@ public void setId_sitio(int id_sitio) {
 	this.id_sitio = id_sitio;
 }
 
+public int getId_reserva() {
+	return id_reserva;
+}
+
+public void setId_reserva(int id_reserva) {
+	this.id_reserva = id_reserva;
+}
+
 }

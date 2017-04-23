@@ -227,8 +227,8 @@ public class DAOTablaFunciones {
 		ResultSet rs = prepStmt.executeQuery();
 
 		while (rs.next()) {
-			boolean disp = false;
-			if(Integer.parseInt(rs.getString("ID_ESPECTACULO"))==1) disp=true;
+			boolean disp = true;
+			if(rs.getString("ESTADO")==Funcion.ESTADO_REALIZADA) disp=false;
 			int id2 = Integer.parseInt(rs.getString("ID"));
 			Date fecha = rs.getDate("FECHA");
 			int id_espectaculo = Integer.parseInt(rs.getString("ID_ESPECTACULO"));
@@ -237,6 +237,7 @@ public class DAOTablaFunciones {
 			String estado = rs.getString("ESTADO");	
 			funcion = new Funcion(id2, fecha, id_espectaculo, hora, id_sitio,estado);
 			funcion.setDisponibilidad(disp);
+			funcion.setGanancias(Double.parseDouble(rs.getString("GANANCIAS")));
 		}
 
 		return funcion;

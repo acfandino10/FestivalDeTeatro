@@ -25,13 +25,13 @@ public class CompaniasServices
 {
 	
 	/**
-	 * Atributo que usa la anotación @Context para tener el ServletContext de la conexión actual.
+	 * Atributo que usa la anotaciÃ³n @Context para tener el ServletContext de la conexiÃ³n actual.
 	 */
 	@Context
 	private ServletContext context;
 
 	/**
-	 * Método que retorna el path de la carpeta WEB-INF/ConnectionData en el deploy actual dentro del servidor.
+	 * MÃ©todo que retorna el path de la carpeta WEB-INF/ConnectionData en el deploy actual dentro del servidor.
 	 * @return path de la carpeta WEB-INF/ConnectionData en el deploy actual.
 	 */
 	private String getPath() {
@@ -63,18 +63,18 @@ public class CompaniasServices
 	//TODO
 	/**
 	 * RFC8.
-	 * CONSULTAR COMPAÑÍA
-	 * Muestra la información relevante a una compañía de teatro.
-	 * Consolida para cada uno de sus espectáculos
+	 * CONSULTAR COMPANÌƒIÌ�A
+	 * Muestra la informacioÌ�n relevante a una companÌƒiÌ�a de teatro.
+	 * Consolida para cada uno de sus espectaÌ�culos
 	 * la asistencia total, la asistencia de clientes registrados,
-	 * el dinero generado en la taquilla y porcentaje de ocupación
-	 * de sus funciones por cada sitio de realización.
-	 * Esta operación es realizada por los usuarios compañía de teatro y el administrador de FestivAndes.
+	 * el dinero generado en la taquilla y porcentaje de ocupacioÌ�n
+	 * de sus funciones por cada sitio de realizacioÌ�n.
+	 * Esta operacioÌ�n es realizada por los usuarios companÌƒiÌ�a de teatro y el administrador de FestivAndes.
 	 * 
 	 * NOTA: Respetando la privacidad de los clientes,
-	 * cuando un una compañía hace esta consulta obtiene la información de
+	 * cuando un una companÌƒiÌ�a hace esta consulta obtiene la informacioÌ�n de
 	 * sus propias funciones, mientras que el administrador obtiene toda
-	 * la información. Ver RNF1.
+	 * la informacioÌ�n. Ver RNF1.
 	 * @return JSON
 	 * @throws Exception 
 	 */
@@ -86,7 +86,7 @@ public class CompaniasServices
 		FestivAndesMaster tm = new FestivAndesMaster(getPath());
 		String rol=tm.buscarUsuariosPorId(id).getRol();
 		System.out.println("EL ROL QUE TENEMOS EN ESTE CASO ES: "+rol);
-		if(rol.compareTo(Usuario.ROL_ESPECTADOR)==0) throw new Exception("El usuario no es un usuario compañia, por lo tanto, no se le permite ver el contenido de esta compañia");
+		if(rol.compareTo(Usuario.ROL_ESPECTADOR)==0) throw new Exception("El usuario no es un usuario compaÃ±ia, por lo tanto, no se le permite ver el contenido de esta compaÃ±ia");
 		else if(rol.compareTo(Usuario.ROL_COMPANIA)==0){
 			System.out.println("ENTRA A ROL COMPANIA");
 			return consultarCompaniasPorUnaCompania(id);
@@ -135,7 +135,7 @@ public class CompaniasServices
 				System.out.println("SE supone que tieen que recorrer: "+tm.darCompanias().size());
 				System.out.println("Esta Compania");
 				int asistencia = tm.darAsistenciaTotalPorCompania(compania.getId());
-				object.add("ID Compañia", compania.getId());
+				object.add("ID CompaÃ±ia", compania.getId());
 				object.add("asistenciaTotal", asistencia);
 				object.add("asistenciaRegistrados", tm.darAsistenciaRegistradosPorCompania(compania.getId()));
 				object.add("dineroGeneradoTaquilla", tm.darGananciaPorCompania(compania.getId()));

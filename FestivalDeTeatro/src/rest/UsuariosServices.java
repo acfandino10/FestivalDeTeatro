@@ -312,7 +312,7 @@ public class UsuariosServices {
 				     Usuario a = tm.buscarUsuariosPorId(id);
 						if(a.getRol().compareTo(Usuario.ROL_ADMINISTRADOR)==0){
 						try {
-							 e = tm.buscarFuncionPorId(idFuncion);
+							 e = tm.buscarFuncionPorId(idFuncion,false);
 						     e.setDisponibilidad(false);
 						     tm.updateEvento(e);
 						} catch (Exception o) {

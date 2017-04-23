@@ -35,8 +35,8 @@ public class Reserva {
 	 * @param id - Id del espectador
 	 * @param dirPrincipal - Direccion de la oficina principal.
 	 */
-	public Reserva( @JsonProperty(value="id_espectador")int id_espectador, @JsonProperty(value="id_funcion")int id_funcion,
-	@JsonProperty(value="estadoactive") String estadoactive,@JsonProperty(value="id")int id	) {
+	public Reserva(@JsonProperty(value="id")int id, @JsonProperty(value="id_espectador")int id_espectador, @JsonProperty(value="id_funcion")int id_funcion,
+	@JsonProperty(value="estadoactive") String estadoactive	) {
 		super();
 		this.id=id;
 		this.id_espectador = id_espectador;

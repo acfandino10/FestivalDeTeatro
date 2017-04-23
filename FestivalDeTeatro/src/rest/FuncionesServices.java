@@ -25,13 +25,13 @@ import vos.Usuario;
 @Path("funciones")
 public class FuncionesServices {
 	/**
-	 * Atributo que usa la anotación @Context para tener el ServletContext de la conexión actual.
+	 * Atributo que usa la anotaciÃ³n @Context para tener el ServletContext de la conexiÃ³n actual.
 	 */
 	@Context
 	private ServletContext context;
 
 	/**
-	 * Método que retorna el path de la carpeta WEB-INF/ConnectionData en el deploy actual dentro del servidor.
+	 * MÃ©todo que retorna el path de la carpeta WEB-INF/ConnectionData en el deploy actual dentro del servidor.
 	 * @return path de la carpeta WEB-INF/ConnectionData en el deploy actual.
 	 */
 	private String getPath() {
@@ -44,7 +44,7 @@ public class FuncionesServices {
 	}
 	
 	/**
-	 * Método que expone servicio REST usando GET que da todos los objetos de la base de datos.
+	 * MÃ©todo que expone servicio REST usando GET que da todos los objetos de la base de datos.
 	 * <b>URL: </b> http://"ip o nombre de host":8080/FestivAndes/rest/eventos
 	 * @return Json con todos los objetos de la base de datos O json con 
      * el error que se produjo
@@ -78,15 +78,15 @@ public class FuncionesServices {
 	//TODO
 	/**
 	 * RF14
-	 * CANCELAR UNA FUNCIÓN
-	 * Cancela la realización de una función programada en FestivAndes.
-	 * Puede darse, inclusive, si la función ya ha empezado,
-	 * pero no si ya terminó.
-	 * Cuando se cancela una función,
+	 * CANCELAR UNA FUNCIOÌ�N
+	 * Cancela la realizacioÌ�n de una funcioÌ�n programada en FestivAndes.
+	 * Puede darse, inclusive, si la funcioÌ�n ya ha empezado,
+	 * pero no si ya terminoÌ�.
+	 * Cuando se cancela una funcioÌ�n,
 	 * se debe devolver el dinero de
 	 * todos los usuarios registrados que tienen boletas adquiridas.
-	 * Esta operación puede ser realizada por un usuario administrador de FestivAndes.
-	 * DEBE utilizar como subtransacción la implementación del requerimiento RF12.
+	 * Esta operacioÌ�n puede ser realizada por un usuario administrador de FestivAndes.
+	 * DEBE utilizar como subtransaccioÌ�n la implementacioÌ�n del requerimiento RF12.
 	 * @param evento
 	 * @return
 	 * @throws Exception
@@ -100,8 +100,8 @@ public class FuncionesServices {
 		try {
 			Usuario us = tm.buscarUsuariosPorId(id);
 			if(us.getRol().compareTo(Usuario.ROL_ADMINISTRADOR)==0){
-				Funcion fun = tm.buscarFuncionPorId(idFuncion);
-				if(fun.getEstado().compareTo(Funcion.ESTADO_REALIZADA)==0) throw new Exception("La función no puede ser cancelada puesto que ya fue realizada");
+				Funcion fun = tm.buscarFuncionPorId(idFuncion,false);
+				if(fun.getEstado().compareTo(Funcion.ESTADO_REALIZADA)==0) throw new Exception("La funcion no puede ser cancelada puesto que ya fue realizada");
 				else{
 					JsonObjectBuilder obj = Json.createObjectBuilder();
 					for(Espectador esp: tm.darEspectadoresDeFuncionYDevolverCosto(idFuncion)){
@@ -115,7 +115,7 @@ public class FuncionesServices {
 						tm.updateReserva(res);
 					}
 				}tm.deleteFuncion(idFuncion);
-			}else throw new Exception("Únicamente el administrador puede realizar dicha operación");
+			}else throw new Exception("Ãšnicamente el administrador puede realizar dicha operacion");
 			
 		}  catch (Exception e) {
 			return Response.status(500).entity(doErrorMessage(e)).build();
@@ -131,12 +131,12 @@ public class FuncionesServices {
 	 * Consulta las funciones a las que asiste un cliente registrado de FestivAndes.
 	 * Debe discriminar las funciones ya realizadas o en curso,
 	 * las funciones previstas y las boletas devueltas.
-	 * Esta operación es realizada por los clientes registrados y por
+	 * Esta operacioÌ�n es realizada por los clientes registrados y por
 	 * el usuario administrador de FestivAndes.
 	 * Respetando la privacidad de los clientes,
 	 * cuando un cliente registrado hace esta consulta obtiene la
-	 * información de sus propia actividad, mientras que el administrador
-	 * obtiene toda la información de cualquiera de los clientes. Ver RNF1.
+	 * informacioÌ�n de sus propia actividad, mientras que el administrador
+	 * obtiene toda la informacioÌ�n de cualquiera de los clientes. Ver RNF1.
 	 * @return Asistencia del/los cliente.
 	 * @throws Exception 
 	 */
@@ -146,13 +146,13 @@ public class FuncionesServices {
 	public Response getAsistenciaClientesRegistrados(@QueryParam("id") int id) throws Exception{
 		FestivAndesMaster tm = new FestivAndesMaster(getPath());
 		Usuario usuario = tm.buscarUsuariosPorId(id);
-		if(usuario.getRol().compareTo(Usuario.ROL_COMPANIA)==0) throw new Exception("Lamentamos informarle que esta operación no puede ser realizada por una compañia ya que esta no tiene asistencia a ninguna función u espectáculo");
+		if(usuario.getRol().compareTo(Usuario.ROL_COMPANIA)==0) throw new Exception("Lamentamos informarle que esta operaciÃ³n no puede ser realizada por una compaÃ±ia ya que esta no tiene asistencia a ninguna funciÃ³n u espectÃ¡culo");
 		else if(usuario.getRol().compareTo(Usuario.ROL_ADMINISTRADOR)==0) return getAsistenciaTodosUsuariosRegistrados();
 		else if(usuario.getRol().compareTo(Usuario.ROL_ESPECTADOR)==0){
 			Espectador esp = tm.buscarEspectadorPorId(usuario.getId());
 			if(esp.isEstaRegistrado()){
 				return getAsistenciaUsuarioRegistrado(id);
-			}else throw new Exception("Lamentamos informarle que esta operación es únicamente para usuarios registrados");
+			}else throw new Exception("Lamentamos informarle que esta operaciÃ³n es Ãºnicamente para usuarios registrados");
 		}
 		return null;
 	}

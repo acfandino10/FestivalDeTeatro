@@ -77,7 +77,7 @@ public class DAOTablaReservas {
 			int id_evento = Integer.parseInt(rs.getString("ID_FUNCION"));
 			String estado = rs.getString("ESTADOACTIVE");
 			int id = Integer.parseInt(rs.getString("ID"));
-			r.add(new Reserva(id_espectador, id_evento,estado,id));
+			r.add(new Reserva(id,id_espectador, id_evento,estado));
 		}
 		return r;
 	}
@@ -106,7 +106,7 @@ public class DAOTablaReservas {
 			int id_evento2 = Integer.parseInt(rs.getString("ID_FUNCION"));
 			String estado = rs.getString("ESTADOACTIVE");
 			int id = Integer.parseInt("ID");
-			lista.add(new Reserva(id_espectador, id_evento2,estado,id));
+			lista.add(new Reserva(id,id_espectador, id_evento2,estado));
 		}
 
 		return lista;
@@ -172,7 +172,7 @@ public class DAOTablaReservas {
 			int id_evento = Integer.parseInt(rs.getString("ID_FUNCION"));
 			String estado = rs.getString("ESTADOACTIVE");
 			int id = Integer.parseInt("ID");
-			lista.add(new Reserva(id_espectador2, id_evento,estado,id));
+			lista.add(new Reserva(id,id_espectador2, id_evento,estado));
 		}
 
 		return lista;
@@ -199,7 +199,7 @@ public class DAOTablaReservas {
 			int idFuncionNueva = Integer.parseInt(rs.getString("ID_FUNCION"));
 			String estado = Reserva.ESTADO_CANCELADA;
 			int id=Integer.parseInt(rs.getString("ID"));
-			reservas.add(new Reserva(idEspectador, idFuncionNueva,estado,id));
+			reservas.add(new Reserva(id,idEspectador, idFuncionNueva,estado));
 		}
 		System.out.println("-------TERMINA DE DAR RESERVAS POR FUNCION Y CANCELARLAS--------");
 		return reservas;
@@ -221,7 +221,7 @@ public class DAOTablaReservas {
 			int id_evento2 = Integer.parseInt(rs.getString("ID_FUNCION"));
 			String estado = rs.getString("ESTADOACTIVE");
 			int id = Integer.parseInt(rs.getString("ID"));
-			reserva=new Reserva(id_espectador, id_evento2,estado,id);
+			reserva=new Reserva(id,id_espectador, id_evento2,estado);
 		}
 
 		return reserva;
@@ -250,33 +250,34 @@ public class DAOTablaReservas {
 		return fechaReserva;
 	}
 
-	//TODO
+//TODO
 	
-		/**
-		 * Método que agrega la reserva que entra como parámetro a la base de datos.
-		 * @param reserva a agregar. 
-		 * <b> post: </b> se ha agregado a la base de datos en la transaction actual. pendiente que el video master
-		 * haga commit para que baje  a la base de datos.
-		 * @throws SQLException - Cualquier error que la base de datos arroje. No pudo agregar el video a la base de datos
-		 * @throws Exception - Cualquier error que no corresponda a la base de datos
-		 */
-		public void addReserva(Reserva objeto) throws SQLException, Exception {
+	/**
+	 * Método que agrega la reserva que entra como parámetro a la base de datos.
+	 * @param reserva a agregar. 
+	 * <b> post: </b> se ha agregado a la base de datos en la transaction actual. pendiente que el video master
+	 * haga commit para que baje  a la base de datos.
+	 * @throws SQLException - Cualquier error que la base de datos arroje. No pudo agregar el video a la base de datos
+	 * @throws Exception - Cualquier error que no corresponda a la base de datos
+	 */
+	public void addReserva(Reserva objeto) throws SQLException, Exception {
 
-			String sql = "INSERT INTO ISIS2304B071710.RESERVAS VALUES (";
+		String sql = "INSERT INTO ISIS2304B071710.RESERVAS VALUES (";
 
-			sql += objeto.getId_espectador() + ",";
-			sql += objeto.getIdFuncion() + ",'";
-			sql += objeto.getEstado() + "',";
-			sql += objeto.getId() + ")";
-			
+		sql += objeto.getId_espectador() + ",";
+		sql += objeto.getIdFuncion() + ",'";
+		sql += objeto.getEstado() + "',";
+		sql += objeto.getId() + ")";
+		
 
-			System.out.println("SQL stmt:" + sql);
-	 
-			PreparedStatement prepStmt = conn.prepareStatement(sql);
-			recursos.add(prepStmt);
-			prepStmt.executeQuery();
+		System.out.println("SQL stmt:" + sql);
+ 
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		prepStmt.executeQuery();
 
-		}
+	}
+	
 	
 	
 	

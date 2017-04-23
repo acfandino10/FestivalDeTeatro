@@ -1410,45 +1410,44 @@ public class FestivAndesMaster {
 		}
 		
 		
-     //TODO
-		public Funcion buscarFuncionPorId(int id, boolean conectado) throws SQLException {
+     public Funcion buscarFuncionPorId(int id, boolean conectado) throws SQLException {
 			
-	    	 Funcion funcion = null;
-	    	
-				DAOTablaFunciones dao = new DAOTablaFunciones();
-				try 
-				{
-					//////Transacción
-					if(!conectado){
-					this.conn = darConexion();
-					}
-					dao.setConn(conn);
-					funcion = dao.buscarFuncionPorId(id);
-
-				} catch (SQLException e) {
-					System.err.println("SQLException:" + e.getMessage());
-					e.printStackTrace();
-					throw e;
-				} catch (Exception e) {
-					System.err.println("GeneralException:" + e.getMessage());
-					e.printStackTrace();
-					throw e;
-				} finally {
-					try {
-
-						dao.cerrarRecursos();
-						if(!conectado){
-						if(this.conn!=null)
-							this.conn.close();
-						}
-					} catch (SQLException exception) {
-						System.err.println("SQLException closing resources:" + exception.getMessage());
-						exception.printStackTrace();
-						throw exception;
-					}
+    	 Funcion funcion = null;
+    	
+			DAOTablaFunciones dao = new DAOTablaFunciones();
+			try 
+			{
+				//////Transacción
+				if(!conectado){
+				this.conn = darConexion();
 				}
-				return funcion;
+				dao.setConn(conn);
+				funcion = dao.buscarFuncionPorId(id);
+
+			} catch (SQLException e) {
+				System.err.println("SQLException:" + e.getMessage());
+				e.printStackTrace();
+				throw e;
+			} catch (Exception e) {
+				System.err.println("GeneralException:" + e.getMessage());
+				e.printStackTrace();
+				throw e;
+			} finally {
+				try {
+
+					dao.cerrarRecursos();
+					if(!conectado){
+					if(this.conn!=null)
+						this.conn.close();
+					}
+				} catch (SQLException exception) {
+					System.err.println("SQLException closing resources:" + exception.getMessage());
+					exception.printStackTrace();
+					throw exception;
+				}
 			}
+			return funcion;
+		}
 		
      
      public double reporteFuncionTotal(int id) throws SQLException {
@@ -2600,8 +2599,7 @@ public class FestivAndesMaster {
 					}
 					return lista;
 				}
-				
-				//TODO			
+	//TODO			
 				/**
 				 * Método que modela la transacción que agrega un solo objeto a la base de datos.
 				 * <b> post: </b> se ha agregado el objeto que entra como parámetro
@@ -2884,6 +2882,42 @@ public class FestivAndesMaster {
 					}
 				}
 				
+				/**
+				 * Método que modela la transacción que elimina el objeto que entra como parámetro a la base de datos.
+				 * <b> post: </b> se ha eliminado el objeto que entra como parámetro
+				 * @param objeto - a eliminar. objeto != null
+				 * @throws Exception - cualquier error que se genera actualizando los videos
+				 */
+				public void deleteEspectaculo(Espectaculo objeto) throws Exception {
+					DAOTablaEspectaculo dao = new DAOTablaEspectaculo();
+					try 
+					{
+						//////Transacción
+						this.conn = darConexion();
+						dao.setConn(conn);
+						dao.deleteEspectaculo(objeto);
+				
+					} catch (SQLException e) {
+						System.err.println("SQLException:" + e.getMessage());
+						e.printStackTrace();
+						throw e;
+					} catch (Exception e) {
+						System.err.println("GeneralException:" + e.getMessage());
+						e.printStackTrace();
+						throw e;
+					} finally {
+						try {
+							dao.cerrarRecursos();
+							if(this.conn!=null)
+								this.conn.close();
+						} catch (SQLException exception) {
+							System.err.println("SQLException closing resources:" + exception.getMessage());
+							exception.printStackTrace();
+							throw exception;
+						}
+					}
+				}
+
 				/**
 				 * Método que modela la transacción que agrega los objetos que entran como parámetro a la base de datos.
 				 * <b> post: </b> se han agregado los objetos que entran como parámetro
@@ -3251,44 +3285,7 @@ public class FestivAndesMaster {
 					}
 				}
 
-				/**
-				 * Método que modela la transacción que elimina el objeto que entra como parámetro a la base de datos.
-				 * <b> post: </b> se ha eliminado el objeto que entra como parámetro
-				 * @param objeto - a eliminar. objeto != null
-				 * @throws Exception - cualquier error que se genera actualizando los videos
-				 */
-				public void deleteEspectaculo(Espectaculo objeto) throws Exception {
-					DAOTablaEspectaculo dao = new DAOTablaEspectaculo();
-					try 
-					{
-						//////Transacción
-						this.conn = darConexion();
-						dao.setConn(conn);
-						dao.deleteEspectaculo(objeto);
-
-					} catch (SQLException e) {
-						System.err.println("SQLException:" + e.getMessage());
-						e.printStackTrace();
-						throw e;
-					} catch (Exception e) {
-						System.err.println("GeneralException:" + e.getMessage());
-						e.printStackTrace();
-						throw e;
-					} finally {
-						try {
-							dao.cerrarRecursos();
-							if(this.conn!=null)
-								this.conn.close();
-						} catch (SQLException exception) {
-							System.err.println("SQLException closing resources:" + exception.getMessage());
-							exception.printStackTrace();
-							throw exception;
-						}
-					}
-				}
-				
-				
-		     public Espectaculo buscarEspectaculoPorId(int id) throws SQLException {
+				public Espectaculo buscarEspectaculoPorId(int id) throws SQLException {
 					
 		    	 Espectaculo es = null;
 		    	
@@ -3937,7 +3934,7 @@ public class FestivAndesMaster {
 				}
 				return note;
 			}
-			
+	
 			public void registrarCompraBoleta(Reserva objeto, int numeroSilla) throws Exception {
 				DAOTablaReservas dao = new DAOTablaReservas();
 				try 
@@ -3953,7 +3950,7 @@ public class FestivAndesMaster {
 						{
 							dao.addReserva(objeto);
 						    s.setEstaReservada(true);
-                            s.setIdReserva(objeto.getId());
+                            s.setId_reserva(objeto.getId());
                        	    funcion.setGanancias(funcion.getGanancias()+s.getCosto());
 						    
 						    
@@ -4023,7 +4020,7 @@ public class FestivAndesMaster {
 						    for(int i = 1; i<cantSillas; i++)
 						      {
 						    	 Silla s1 = s.get(posicionSilla);
-						    	 s1.setIdReserva(objeto.getId());
+						    	 s1.setId_reserva(objeto.getId());
 						    	 s1.setEstaReservada(true);
 						    	 posicionSilla--;
 						      }
@@ -4055,5 +4052,8 @@ public class FestivAndesMaster {
 					}
 				}
 			}
+	
 				
+			
+			
 }

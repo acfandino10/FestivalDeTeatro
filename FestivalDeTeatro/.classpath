@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/Java SE 8 [1.8.0_45]">
-		<attributes>
-			<attribute name="owner.project.facets" value="java"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.jboss.ide.eclipse.as.core.server.runtime.runtimeTarget/WildFly 8.x Runtime">
 		<attributes>
 			<attribute name="owner.project.facets" value="jst.web"/>
@@ -13,6 +8,15 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="/BaseCopy/WebContent/WEB-INF/lib/jackson-all-1.7.5.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/.jsdtscope"/>
+	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.core.resources.prefs"/>
+	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.jdt.core.prefs"/>
+	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.wst.common.component"/>
+	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.wst.common.project.facet.core.xml"/>
+	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.wst.jsdt.ui.superType.container"/>
+	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.wst.jsdt.ui.superType.name"/>
+	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.jboss.ide.eclipse.as.core.prefs"/>
+	<classpathentry kind="lib" path="C:/Users/PAULA/Downloads/javax.json-1.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

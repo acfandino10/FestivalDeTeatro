@@ -77,7 +77,7 @@ public class ReservaServices {
 		FestivAndesMaster tm = new FestivAndesMaster(getPath());
 		Usuario a = tm.buscarUsuariosPorId(idUsuario);
 		if(a.getRol()==Usuario.ROL_ESPECTADOR){
-			Reserva reserva = new Reserva(idUsuario, idFuncion, "ESTADO_ACTIVA",id);
+			Reserva reserva = new Reserva(id,idUsuario, idFuncion, "ESTADO_ACTIVA");
 			try {
 				tm.registrarCompraBoleta(reserva, numeroSilla);
 
@@ -116,7 +116,7 @@ public class ReservaServices {
 		FestivAndesMaster tm = new FestivAndesMaster(getPath());
 		Usuario a = tm.buscarUsuariosPorId(idUsuario);
 		if(a.getRol()==Usuario.ROL_ESPECTADOR){
-			Reserva reserva = new Reserva(idUsuario, idFuncion, "ESTADO_ACTIVA",id);
+			Reserva reserva = new Reserva(45,idUsuario, idFuncion, "ESTADO_ACTIVA");
 			try {
 				
 				tm.registrarComprasBoletas(reserva, localidad, cantidadSillas);				
@@ -234,6 +234,25 @@ public class ReservaServices {
 		} else return Response.status(500).entity(doErrorMessage(new Exception("El usuario tiene que ser rol espectador."))).build();
 
 		return Response.status(200).entity(esp).build();
+	}
+	
+	
+	//Probando...
+	@PUT
+	@Path("agregar")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addReserva(Reserva objeto) throws Exception {
+		FestivAndesMaster tm = new FestivAndesMaster(getPath());
+		Reserva reserva;
+		try {
+			System.out.println("----comienza add REserva---");
+			reserva=tm.addReserva(objeto);
+			System.out.println("----termina add Reserva--");
+		} catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
+		}
+		return Response.status(200).entity(reserva).build();
 	}
 	
 	
