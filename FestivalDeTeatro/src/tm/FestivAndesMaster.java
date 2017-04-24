@@ -3993,7 +3993,8 @@ public class FestivAndesMaster {
 						   	System.out.println("----Antes del primer for----");
 						   	System.out.println("----Y el size a recorrer es " + s.size());
 							for(int i=0; i<s.size() && sillasReservadas!=cantSillas; i++){
-					System.out.println("----Entro en el forrr------");			
+					System.out.println("----Entro en el forrr------: " + i);
+					System.out.println("----Y la cantidad de sillas son------: " + cantSillas);
 							Silla s1 = s.get(i);
 							ultimaPosicion = i;
 							
@@ -4001,6 +4002,7 @@ public class FestivAndesMaster {
 							else sillasReservadas=0;							
 						}
 							System.out.println("---Salio del for----");
+							System.out.println("----Las sillas reservadas son------: " + sillasReservadas);
 							
 							if(sillasReservadas==0) 
 							{
@@ -4050,6 +4052,6 @@ public class FestivAndesMaster {
 						throw exception;
 					}
 				}
-			}			
+			}
 			
 }

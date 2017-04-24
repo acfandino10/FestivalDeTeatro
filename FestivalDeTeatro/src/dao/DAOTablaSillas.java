@@ -320,6 +320,11 @@ public class DAOTablaSillas {
 			int numero = Integer.parseInt(rs.getString("NUMERO"));
 			double costo = Double.parseDouble(rs.getString("COSTO"));
 			Silla toAdd = new Silla(numero, costo, localidad, sitio);
+			int estaReservada = Integer.parseInt(rs.getString("ESTARESERVADA"));
+			boolean siOno = false;
+			if(estaReservada == 1) siOno = true; 
+			toAdd.setEstaReservada(siOno);
+			if(siOno) toAdd.setId_reserva(Integer.parseInt(rs.getString("ID_RESERVA")));
 			sillas.add(toAdd);
 		}
 		System.out.println("-----Tengo" + sillas);
