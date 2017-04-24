@@ -293,6 +293,37 @@ public class DAOTablaSillas {
 		return silla;
 	}
 	
-	
+	/**
+	 * Método que busca las sillas en la localidad y sitio que entra como parámetro.
+	 * @param name - localidad a buscar
+	 * @return ArrayList con las sillas
+	 * @throws SQLException - Cualquier error que la base de datos arroje.
+	 * @throws Exception - Cualquier error que no corresponda a la base de datos
+	 */
+	public ArrayList<Silla> buscarSillasPorSitioYLocalidad(int sitio, String localidad) throws SQLException, Exception {
+		ArrayList<Silla> sillas = new ArrayList<Silla>();
+		
+		//localidad=localidad.substring(1, localidad.length()-1);
+		
+		System.out.println("-------La localidad es " + localidad);
+		String sql = "SELECT * FROM ISIS2304B071710.SILLAS WHERE LOCALIDAD ='" + localidad + "' AND ID_SITIO ='" + sitio + "'" ;		
+		System.out.println("SQL stmt:" + sql);
+		System.out.println("-----SIRVIO LA BUSQUEDA SQL");
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		System.out.println("al menos entro a esta porqueria");
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+        int i = 1;
+		while (rs.next()) {
+			System.out.println("VENGA, SIRVA POR favorcitoooo.---" + i++);
+			int numero = Integer.parseInt(rs.getString("NUMERO"));
+			double costo = Double.parseDouble(rs.getString("COSTO"));
+			Silla toAdd = new Silla(numero, costo, localidad, sitio);
+			sillas.add(toAdd);
+		}
+		System.out.println("-----Tengo" + sillas);
+		return sillas;
+	}
 	
 }

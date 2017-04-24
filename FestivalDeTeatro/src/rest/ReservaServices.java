@@ -27,13 +27,13 @@ public class ReservaServices {
 
 
 	/**
-	 * Atributo que usa la anotaciÃ³n @Context para tener el ServletContext de la conexiÃ³n actual.
+	 * Atributo que usa la anotaciÃƒÂ³n @Context para tener el ServletContext de la conexiÃƒÂ³n actual.
 	 */
 	@Context
 	private ServletContext context;
 
 	/**
-	 * MÃ©todo que retorna el path de la carpeta WEB-INF/ConnectionData en el deploy actual dentro del servidor.
+	 * MÃƒÂ©todo que retorna el path de la carpeta WEB-INF/ConnectionData en el deploy actual dentro del servidor.
 	 * @return path de la carpeta WEB-INF/ConnectionData en el deploy actual.
 	 */
 	private String getPath() {
@@ -59,83 +59,59 @@ public class ReservaServices {
 		return Response.status(200).entity(lista).build();
 	}
 		
-	/**
-     * MÃ©todo que expone servicio REST usando PUT que agrega el objeto que recibe en Json
-     * <b>URL: </b> http://"ip o nombre de host":8080/FestivAndes/rest/usuarios/usuario
-     * @param objeto - a agregar
-     * @return Json con el objeto que agrego o Json con el error que se produjo
-	 * @throws Exception 
-     */
-	@GET
-	@Path("comprar")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response registrarCompraBoleta(@QueryParam("ID_ESPECTADOR") int idUsuario, 
-			@QueryParam("ID_FUNCION") int idFuncion,
-			@QueryParam("ID") int id,
-			@QueryParam("numeroSilla") int numeroSilla) throws Exception {
-		FestivAndesMaster tm = new FestivAndesMaster(getPath());
-		Usuario a = tm.buscarUsuariosPorId(idUsuario);
-		if(a.getRol()==Usuario.ROL_ESPECTADOR){
-			Reserva reserva = new Reserva(id,idUsuario, idFuncion, "ESTADO_ACTIVA");
-			try {
-				tm.registrarCompraBoleta(reserva, numeroSilla);
-
-			} catch (Exception e) {
-				return Response.status(500).entity(doErrorMessage(e)).build();
-			}
-			return Response.status(200).entity(null).build();
-		} else return null;
-		
-	}
 
 	//TODO RF10
-	/**
-	 * RF10
-	 * REGISTRAR COMPRA MUÌ�LTIPLE DE BOLETAS
-	 * Registra la compra de grupos de boletas para una funcioÌ�n, de acuerdo con el enunciado.
-	 * Esta operacioÌ�n puede ser realizada por un cliente registrado de FestivAndes.
-	 * DEBE utilizar como subtransaccioÌ�n la implementacioÌ�n del
-	 * requerimiento RF8 de la iteracioÌ�n anterior.
-	 * @param idUsuario
-	 * @param idEvento
-	 * @param numeroSilla
-	 * @param cantidadSillas
-	 * @return
-	 * @throws Exception
-	 */
-	@GET
-	@Path("compras")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response registrarCompraBoletas(@QueryParam("idUsuario") int idUsuario, 
-			@QueryParam("idFuncion") int idFuncion,
-			@QueryParam("id") int id,
-			@QueryParam("localidad") String localidad,
-			@QueryParam("cantidadSillas") int cantidadSillas) throws Exception {
-		FestivAndesMaster tm = new FestivAndesMaster(getPath());
-		Usuario a = tm.buscarUsuariosPorId(idUsuario);
-		if(a.getRol()==Usuario.ROL_ESPECTADOR){
-			Reserva reserva = new Reserva(45,idUsuario, idFuncion, "ESTADO_ACTIVA");
-			try {
-				
-				tm.registrarComprasBoletas(reserva, localidad, cantidadSillas);				
-			} catch (Exception e) {
-				return Response.status(500).entity(doErrorMessage(e)).build();
-			}
-			return Response.status(200).entity(null).build();
-		} else return null;
-		
-	}
+		/**
+		 * RF10
+		 * REGISTRAR COMPRA MUÌ�LTIPLE DE BOLETAS
+		 * Registra la compra de grupos de boletas para una funcioÌ�n, de acuerdo con el enunciado.
+		 * Esta operacioÌ�n puede ser realizada por un cliente registrado de FestivAndes.
+		 * DEBE utilizar como subtransaccioÌ�n la implementacioÌ�n del
+		 * requerimiento RF8 de la iteracioÌ�n anterior.
+		 * @param idUsuario
+		 * @param idEvento
+		 * @param numeroSilla
+		 * @param cantidadSillas
+		 * @return
+		 * @throws Exception
+		 */
+		@GET
+		@Path("compras")
+		@Consumes(MediaType.APPLICATION_JSON)
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response registrarCompraBoletas(@QueryParam("idUsuario") int idUsuario, 
+				@QueryParam("idFuncion") int idFuncion,
+				@QueryParam("id") int id,
+				@QueryParam("localidad") String localidad,
+				@QueryParam("cantidadSillas") int cantidadSillas) throws Exception {
+			System.out.println("-----------Entra al metodo por rest---------");
+			FestivAndesMaster tm = new FestivAndesMaster(getPath());
+			System.out.println("------Encuentra el master-------");
+			Espectador a = tm.buscarEspectadorPorId(idUsuario);
+			System.out.println("-----------Encontro el usuario-----------");
+			
+				System.out.println("--------Entro al if----------");
+				Reserva reserva = new Reserva(id,idUsuario, idFuncion, "ESTADO_ACTIVA");
+				System.out.println("--------------Creo la reserva------");
+				try {
+					System.out.println("----entro al trydel rest-----");
+					tm.registrarComprasBoletas(reserva, localidad, cantidadSillas);	
+					System.out.println("--------Registro las boletas");
+				} catch (Exception e) {
+					System.out.println("------Entro al catch----------");
+					return Response.status(500).entity(doErrorMessage(e)).build();
+				}
+				return Response.status(200).entity(reserva).build();		
+		}
 	
 //TODO RF11
 	/**
 	 * RF11
 	 * REGISTRAR COMPRA DE UN ABONAMIENTO
 	 * Registra la compra de un abonamiento, de acuerdo con el enunciado.
-	 * Esta operacioÌ�n puede ser realizada por un cliente registrado de FestivAndes.
-	 * DEBE utilizar como subtransaccioÌ�n la implementacioÌ�n del
-	 * requerimiento RF8 de la iteracioÌ�n anterior.
+	 * Esta operacioÃŒï¿½n puede ser realizada por un cliente registrado de FestivAndes.
+	 * DEBE utilizar como subtransaccioÃŒï¿½n la implementacioÃŒï¿½n del
+	 * requerimiento RF8 de la iteracioÃŒï¿½n anterior.
 	 * @param idUsuario
 	 * @param idEvento
 	 * @param numeroSilla
@@ -171,8 +147,8 @@ public class ReservaServices {
 	/**
 	 * RF12
 	 * DEVOLVER BOLETA
-	 * Registra la devolucioÌ�n de una boleta, de acuerdo con el enunciado.
-	 * Esta operacioÌ�n puede ser realizada por un cliente registrado de FestivAndes.
+	 * Registra la devolucioÃŒï¿½n de una boleta, de acuerdo con el enunciado.
+	 * Esta operacioÃŒï¿½n puede ser realizada por un cliente registrado de FestivAndes.
 	 * @param idUsuario
 	 * @param idEvento
 	 * @param numeroSilla
@@ -207,9 +183,9 @@ public class ReservaServices {
 	/**
 	 * RF13
 	 * DEVOLVER ABONAMIENTO
-	 * Registra la devolucioÌ�n de un abonamiento, de acuerdo con el enunciado.
-	 * Esta operacioÌ�n puede ser realizada por un cliente registrado de FestivAndes.
-	 * DEBE utilizar como subtransaccioÌ�n la implementacioÌ�n de los requerimientos RF12.
+	 * Registra la devolucioÃŒï¿½n de un abonamiento, de acuerdo con el enunciado.
+	 * Esta operacioÃŒï¿½n puede ser realizada por un cliente registrado de FestivAndes.
+	 * DEBE utilizar como subtransaccioÃŒï¿½n la implementacioÃŒï¿½n de los requerimientos RF12.
 	 * @param idUsuario
 	 * @param idEvento
 	 * @param numeroSilla

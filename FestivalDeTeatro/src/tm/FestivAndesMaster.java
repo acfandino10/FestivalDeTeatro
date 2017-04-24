@@ -3933,37 +3933,18 @@ public class FestivAndesMaster {
 					}
 				}
 				return note;
-			}
-	
-			public void registrarCompraBoleta(Reserva objeto, int numeroSilla) throws Exception {
-				DAOTablaReservas dao = new DAOTablaReservas();
+			}		
+
+			public ArrayList<Silla> buscarSillasPorSitioYLocalidad(int id_sitio, String localidad, boolean conectado) throws Exception {
+				ArrayList<Silla> lista;
+				DAOTablaSillas dao = new DAOTablaSillas();
 				try 
 				{
 					//////Transacción
-					this.conn = darConexion();
-					dao.setConn(conn);					
-											
-					Funcion funcion = buscarFuncionPorId(objeto.getIdFuncion(),true);
-                    Silla s = buscarSillasPorNumero(numeroSilla);
+					if(!conectado) this.conn = darConexion();
+					dao.setConn(conn);
+					lista = dao.buscarSillasPorSitioYLocalidad(id_sitio, localidad);
 
-						if(funcion.isDisponibilidad() && s.isEstaReservada())
-						{
-							dao.addReserva(objeto);
-						    s.setEstaReservada(true);
-                            s.setId_reserva(objeto.getId());
-                       	    funcion.setGanancias(funcion.getGanancias()+s.getCosto());
-						    
-						    
-						  Espectaculo es = buscarEspectaculoPorId(funcion.getId_espectaculo());
-						  es.setRentabilidad(es.getRentabilidad() + s.getCosto());							
-						}
-						else
-						{
-							conn.rollback();
-							throw new Exception("No hay disponibilidad");								
-						}					
-					conn.commit();
-					
 				} catch (SQLException e) {
 					System.err.println("SQLException:" + e.getMessage());
 					e.printStackTrace();
@@ -3975,55 +3956,73 @@ public class FestivAndesMaster {
 				} finally {
 					try {
 						dao.cerrarRecursos();
+						if(!conectado){
 						if(this.conn!=null)
 							this.conn.close();
+					 }
 					} catch (SQLException exception) {
 						System.err.println("SQLException closing resources:" + exception.getMessage());
 						exception.printStackTrace();
 						throw exception;
 					}
 				}
-			}
+				return lista;
+			}		
+			
 
 			public void registrarComprasBoletas(Reserva objeto, String localidad, int cantSillas) throws Exception {
+				System.out.println("---------------Entro al metodo del master-----------");
 				DAOTablaReservas dao = new DAOTablaReservas();
+				System.out.println("----Creo el dao en el master---------");
 				try
 				{
 					//////Transacción
 					this.conn = darConexion();
-					dao.setConn(conn);					
+					dao.setConn(conn);	
+					System.out.println("------Conecto dentro del try del master-------");
 											
 					Funcion funcion = buscarFuncionPorId(objeto.getIdFuncion(),true);
-					ArrayList<Silla> s = buscarSillasPorLocalidad(localidad);
-						if(funcion.isDisponibilidad())
-						{						
+					
+					System.out.println("-----Encontro la funcion----");
+					ArrayList<Silla> s = buscarSillasPorSitioYLocalidad(funcion.getId_sitio(), localidad, true);
+					if(funcion.isDisponibilidad())
+						{	
+						System.out.println("-------Entro dentro del primer if master ----------");
 						   	int sillasReservadas = 0;
 						   	int ultimaPosicion = 0;
-							for(int i=0; i<s.size()&& sillasReservadas==cantSillas; i++){
-								
+						   	System.out.println("----Antes del primer for----");
+						   	System.out.println("----Y el size a recorrer es " + s.size());
+							for(int i=0; i<s.size() && sillasReservadas!=cantSillas; i++){
+					System.out.println("----Entro en el forrr------");			
 							Silla s1 = s.get(i);
 							ultimaPosicion = i;
 							
-							if(!s1.isEstaReservada()) sillasReservadas++;							
+							if(!s1.isEstaReservada()) sillasReservadas++;				
 							else sillasReservadas=0;							
-							}
+						}
+							System.out.println("---Salio del for----");
 							
-							if(sillasReservadas<cantSillas) 
+							if(sillasReservadas==0) 
 							{
+								System.out.println("----No hay sillas suficientes----");
 								conn.rollback();
 								throw new Exception("No hay suficientes sillas contiguas libres en esta localidad");
 							}
 							else
 							{
+								System.out.println("----Hubo sillas suficientes----");		
 						    dao.addReserva(objeto);
+						    System.out.println("-----Agrego la reserva------");
 						    int posicionSilla = ultimaPosicion;
 						    for(int i = 1; i<cantSillas; i++)
 						      {
-						    	 Silla s1 = s.get(posicionSilla);
+						    	System.out.println("-----Entro al for para reservar las sillas----");
+						    	 Silla s1 = s.get(posicionSilla);		
 						    	 s1.setId_reserva(objeto.getId());
 						    	 s1.setEstaReservada(true);
 						    	 posicionSilla--;
 						      }
+						    System.out.println("-----Salio del for-----");
 							  }
 						}						
 						else
@@ -4051,9 +4050,6 @@ public class FestivAndesMaster {
 						throw exception;
 					}
 				}
-			}
-	
-				
-			
+			}			
 			
 }

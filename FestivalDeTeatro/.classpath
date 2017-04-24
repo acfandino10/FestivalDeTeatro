@@ -9,14 +9,6 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/.jsdtscope"/>
-	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.core.resources.prefs"/>
-	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.jdt.core.prefs"/>
-	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.wst.common.component"/>
-	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.wst.common.project.facet.core.xml"/>
-	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.wst.jsdt.ui.superType.container"/>
-	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.eclipse.wst.jsdt.ui.superType.name"/>
-	<classpathentry kind="lib" path="/FestivalDeTeatro22/.settings/org.jboss.ide.eclipse.as.core.prefs"/>
 	<classpathentry kind="lib" path="C:/Users/PAULA/Downloads/javax.json-1.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
