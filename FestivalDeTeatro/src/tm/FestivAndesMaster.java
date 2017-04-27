@@ -4053,5 +4053,102 @@ public class FestivAndesMaster {
 					}
 				}
 			}
+	
+			public void registrarAbonoBoletas(Reserva objeto, String localidad, int cantSillas) throws Exception {
+				System.out.println("---------------Entro al metodo del master-----------");
+				DAOTablaReservas dao = new DAOTablaReservas();
+				System.out.println("----Creo el dao en el master---------");
+				try
+				{
+					//////Transacci√≥n
+					this.conn = darConexion();
+					dao.setConn(conn);	
+					System.out.println("------Conecto dentro del try del master-------");
+											
+					Funcion funcion = buscarFuncionPorId(objeto.getIdFuncion(),true);
+					double saldo = 0.0;
+					System.out.println("-----Encontro la funcion----");
+					ArrayList<Silla> s = buscarSillasPorSitioYLocalidad(funcion.getId_sitio(), localidad, true);
+					
+					Date fechaReserva = dao.darFechaReserva(objeto.getId());
+					long DAY_IN_MS = 1000 * 60 * 60 * 24;
+					Date thatDay = new Date(System.currentTimeMillis() + (7 * 3 * DAY_IN_MS));
+					
+					if(fechaReserva.after(thatDay)){				
+					
+					if(funcion.isDisponibilidad())
+						{	
+						System.out.println("-------Entro dentro del primer if master ----------");
+						   	int sillasReservadas = 0;
+						   	int ultimaPosicion = 0;
+						   	System.out.println("----Antes del primer for----");
+						   	System.out.println("----Y el size a recorrer es " + s.size());
+							for(int i=0; i<s.size() && sillasReservadas!=cantSillas; i++){
+					System.out.println("----Entro en el forrr------: " + i);
+					System.out.println("----Y la cantidad de sillas son------: " + cantSillas);
+							Silla s1 = s.get(i);
+							ultimaPosicion = i;
+							
+							if(!s1.isEstaReservada()) sillasReservadas++;				
+							else sillasReservadas=0;							
+						}
+							System.out.println("---Salio del for----");
+							System.out.println("----Las sillas reservadas son------: " + sillasReservadas);
+							
+							if(sillasReservadas==0) 
+							{
+								System.out.println("----No hay sillas suficientes----");
+								conn.rollback();
+								throw new Exception("No hay suficientes sillas contiguas libres en esta localidad");
+							}
+							else
+							{
+								System.out.println("----Hubo sillas suficientes----");		
+						    dao.addReserva(objeto);
+						    System.out.println("-----Agrego la reserva------");
+						    int posicionSilla = ultimaPosicion;
+						    for(int i = 1; i<cantSillas; i++)
+						      {
+						    	System.out.println("-----Entro al for para reservar las sillas----");
+						    	 Silla s1 = s.get(posicionSilla);		
+						    	 s1.setId_reserva(objeto.getId());
+						    	 s1.setEstaReservada(true);
+						    	 posicionSilla--;
+						    	 saldo = saldo + s1.getCosto()*0.02;
+						      }
+						    System.out.println("-----Salio del for-----");
+						    Espectador espect = buscarEspectadorPorId(objeto.getId_espectador());	
+						    espect.setSaldo(saldo);
+						    System.out.println("-----LlegÛ al final-----");
+							  }
+						}						
+						else
+						{
+							conn.rollback();
+							throw new Exception("No hay disponibilidad en esa funcion");								
+						}						
+				}else throw new Exception("El plazo para comprar el abono de la boleta es unicamente hasta 3 semanas antes del evento.");
+
+					conn.commit();
+				} catch (SQLException e) {
+					System.err.println("SQLException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} catch (Exception e) {
+					System.err.println("GeneralException:" + e.getMessage());
+					e.printStackTrace();
+					throw e;
+				} finally {
+					try {
+						dao.cerrarRecursos();
+						if(this.conn!=null)
+							this.conn.close();
+					} catch (SQLException exception) {
+						System.err.println("SQLException closing resources:" + exception.getMessage());
+						exception.printStackTrace();
+						throw exception;
+					}
+				}
+			}
 			
 }

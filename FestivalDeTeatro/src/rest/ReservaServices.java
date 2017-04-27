@@ -104,42 +104,46 @@ public class ReservaServices {
 				return Response.status(200).entity(reserva).build();		
 		}
 	
-//TODO RF11
-	/**
-	 * RF11
-	 * REGISTRAR COMPRA DE UN ABONAMIENTO
-	 * Registra la compra de un abonamiento, de acuerdo con el enunciado.
-	 * Esta operacioÃŒï¿½n puede ser realizada por un cliente registrado de FestivAndes.
-	 * DEBE utilizar como subtransaccioÃŒï¿½n la implementacioÃŒï¿½n del
-	 * requerimiento RF8 de la iteracioÃŒï¿½n anterior.
-	 * @param idUsuario
-	 * @param idEvento
-	 * @param numeroSilla
-	 * @return
-	 * @throws Exception
-	 */
-	@GET
-	@Path("comprarAbonamiento")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response registrarAbonoBoleta(@QueryParam("id") int id, @QueryParam("localidad") String localidad) throws Exception {
-		FestivAndesMaster tm = new FestivAndesMaster(getPath());
-		Usuario a = tm.buscarUsuariosPorId(id);
-		Espectador esp = tm.buscarEspectadorPorId(id);
-		NotaDebito note;
-		if((a.getRol().compareTo(Usuario.ROL_ESPECTADOR)==0)&&(esp.isEstaRegistrado())){
+		//TODO RF11
+		/**
+		 * RF11
+		 * REGISTRAR COMPRA DE UN ABONAMIENTO
+		 * Registra la compra de un abonamiento, de acuerdo con el enunciado.
+		 * Esta operacioÌ�n puede ser realizada por un cliente registrado de FestivAndes.
+		 * DEBE utilizar como subtransaccioÌ�n la implementacioÌ�n del
+		 * requerimiento RF8 de la iteracioÌ�n anterior.
+		 * @param idUsuario
+		 * @param idEvento
+		 * @param numeroSilla
+		 * @return
+		 * @throws Exception
+		 */
+		@GET
+		@Path("comprarAbonamiento")
+		@Consumes(MediaType.APPLICATION_JSON)
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response registrarAbonoBoleta(@QueryParam("ID_USUARIO") int id, @QueryParam("ID") int idBoleta,
+				@QueryParam("ID_FUNCION") int idFuncion,
+				@QueryParam("cantSillas") int cantSillas,
+				@QueryParam("localidad") String localidad) throws Exception {
+			FestivAndesMaster tm = new FestivAndesMaster(getPath());
+			Usuario a = tm.buscarUsuariosPorId(id);
+			Espectador esp = tm.buscarEspectadorPorId(id);
+			Reserva res = null; 
+			if((a.getRol().compareTo(Usuario.ROL_ESPECTADOR)==0)&&(esp.isEstaRegistrado())){
 
-			try {
-				
-				//note=tm.devolverBoleta(idBoleta, id);
+				try {
+					res = new Reserva(id,idBoleta, idFuncion, "ESTADO_ACTIVA");
+					tm.registrarAbonoBoletas(res,localidad,cantSillas);
+					
 
-			} catch (Exception e) {
-				return Response.status(500).entity(doErrorMessage(e)).build();
-			}
-		} else return Response.status(500).entity(doErrorMessage(new Exception("El usuario tiene que ser rol espectador y estar registrado"))).build();
+				} catch (Exception e) {
+					return Response.status(500).entity(doErrorMessage(e)).build();
+				}
+			} else return Response.status(500).entity(doErrorMessage(new Exception("El usuario tiene que ser rol espectador y estar registrado"))).build();
 
-		return Response.status(200).entity(null).build();
-	}
+			return Response.status(200).entity(res).build();
+		}
 
 
 	
