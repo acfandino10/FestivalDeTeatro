@@ -3862,15 +3862,20 @@ public class FestivAndesMaster {
 						espectador.setSaldo(0.0);
 						updateEspectador(espectador);
 						
-					}else throw new Exception("El plazo para devolver el abono de la boleta es únicamente hasta 3 semanas antes del evento.");
+					}else{
+						conn.rollback();
+						throw new Exception("El plazo para devolver el abono de la boleta es únicamente hasta 3 semanas antes del evento.");
+					}
 
 				} catch (SQLException e) {
 					System.err.println("SQLException:" + e.getMessage());
 					e.printStackTrace();
+					conn.rollback();
 					throw e;
 				} catch (Exception e) {
 					System.err.println("GeneralException:" + e.getMessage());
 					e.printStackTrace();
+					conn.rollback();
 					throw e;
 				} finally {
 					try {
@@ -3881,6 +3886,7 @@ public class FestivAndesMaster {
 					} catch (SQLException exception) {
 						System.err.println("SQLException closing resources:" + exception.getMessage());
 						exception.printStackTrace();
+						conn.rollback();
 						throw exception;
 					}
 				}
@@ -3910,16 +3916,22 @@ public class FestivAndesMaster {
 						note=new NotaDebito(DAY_IN_MS, espectador.getNombre(), new Date(System.currentTimeMillis()),
 								"Motivos personales por los cuales el espectador con ID:"+id+" decide devolver la boleta y se cancela la reserva"+
 								"cuyo valor era de "+silla.getCosto(), silla.getCosto(), "13%", silla.getCosto()*(100-13)/100);
-					}else throw new Exception("El plazo para devolver la boleta es 5 días antes del evento.");
+					}else 
+						{
+						conn.rollback();
+						throw new Exception("El plazo para devolver la boleta es 5 días antes del evento.");
+						}
 
 
 				} catch (SQLException e) {
 					System.err.println("SQLException:" + e.getMessage());
 					e.printStackTrace();
+					conn.rollback();
 					throw e;
 				} catch (Exception e) {
 					System.err.println("GeneralException:" + e.getMessage());
 					e.printStackTrace();
+					conn.rollback();
 					throw e;
 				} finally {
 					try {
@@ -3929,6 +3941,7 @@ public class FestivAndesMaster {
 					} catch (SQLException exception) {
 						System.err.println("SQLException closing resources:" + exception.getMessage());
 						exception.printStackTrace();
+						conn.rollback();
 						throw exception;
 					}
 				}
@@ -3948,10 +3961,12 @@ public class FestivAndesMaster {
 				} catch (SQLException e) {
 					System.err.println("SQLException:" + e.getMessage());
 					e.printStackTrace();
+					conn.rollback();
 					throw e;
 				} catch (Exception e) {
 					System.err.println("GeneralException:" + e.getMessage());
 					e.printStackTrace();
+					conn.rollback();
 					throw e;
 				} finally {
 					try {
@@ -3963,6 +3978,7 @@ public class FestivAndesMaster {
 					} catch (SQLException exception) {
 						System.err.println("SQLException closing resources:" + exception.getMessage());
 						exception.printStackTrace();
+						conn.rollback();
 						throw exception;
 					}
 				}
@@ -4036,10 +4052,12 @@ public class FestivAndesMaster {
 				} catch (SQLException e) {
 					System.err.println("SQLException:" + e.getMessage());
 					e.printStackTrace();
+					conn.rollback();
 					throw e;
 				} catch (Exception e) {
 					System.err.println("GeneralException:" + e.getMessage());
 					e.printStackTrace();
+					conn.rollback();
 					throw e;
 				} finally {
 					try {
@@ -4049,6 +4067,7 @@ public class FestivAndesMaster {
 					} catch (SQLException exception) {
 						System.err.println("SQLException closing resources:" + exception.getMessage());
 						exception.printStackTrace();
+						conn.rollback();
 						throw exception;
 					}
 				}
@@ -4073,6 +4092,7 @@ public class FestivAndesMaster {
 					Date fechaReserva = dao.darFechaReserva(objeto.getId());
 					long DAY_IN_MS = 1000 * 60 * 60 * 24;
 					Date thatDay = new Date(System.currentTimeMillis() + (7 * 3 * DAY_IN_MS));
+					System.out.println("----Identifico las fechas------: " + thatDay.toString()+ fechaReserva);
 					
 					if(fechaReserva.after(thatDay)){				
 					
@@ -4127,16 +4147,20 @@ public class FestivAndesMaster {
 							conn.rollback();
 							throw new Exception("No hay disponibilidad en esa funcion");								
 						}						
-				}else throw new Exception("El plazo para comprar el abono de la boleta es unicamente hasta 3 semanas antes del evento.");
-
+				}else {
+					conn.rollback();
+					throw new Exception("El plazo para comprar el abono de la boleta es unicamente hasta 3 semanas antes del evento.");
+				}
 					conn.commit();
 				} catch (SQLException e) {
 					System.err.println("SQLException:" + e.getMessage());
 					e.printStackTrace();
+					conn.rollback();
 					throw e;
 				} catch (Exception e) {
 					System.err.println("GeneralException:" + e.getMessage());
 					e.printStackTrace();
+					conn.rollback();
 					throw e;
 				} finally {
 					try {
@@ -4146,6 +4170,7 @@ public class FestivAndesMaster {
 					} catch (SQLException exception) {
 						System.err.println("SQLException closing resources:" + exception.getMessage());
 						exception.printStackTrace();
+						conn.rollback();
 						throw exception;
 					}
 				}
